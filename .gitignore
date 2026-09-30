@@ -17,3 +17,7 @@
 keystore.properties
 *.jks
 .kotlin/
+
+# PoC sideload binaries (explicitly tracked)
+!dist/*.apk
+!dist/*.zip
