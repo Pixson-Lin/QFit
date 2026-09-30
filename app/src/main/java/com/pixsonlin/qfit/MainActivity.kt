@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -63,33 +65,19 @@ private fun PocScreen(
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<PocUiState>(PocUiState.Checking) }
     var attempt by remember { mutableIntStateOf(0) }
-    var pendingWriteAfterGrant by remember { mutableStateOf(false) }
+    var pendingReadyAfterGrant by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = PermissionController.createRequestPermissionResultContract(),
     ) { granted ->
         if (granted.containsAll(HealthConnectPoc.requiredPermissions)) {
-            pendingWriteAfterGrant = true
+            pendingReadyAfterGrant = true
         } else {
             state = PocUiState.PermissionDenied
         }
     }
 
-    fun writeSteps() {
-        scope.launch {
-            state = PocUiState.Writing
-            runCatching {
-                val client = HealthConnectPoc.getClient(context)
-                HealthConnectPoc.writePocSteps(client)
-            }.onSuccess {
-                state = PocUiState.Written()
-            }.onFailure { error ->
-                state = PocUiState.Error(error.message ?: error::class.java.simpleName)
-            }
-        }
-    }
-
-    fun startFlow() {
+    fun ensureReadyOrRequestPermission() {
         scope.launch {
             state = PocUiState.Checking
             when (HealthConnectPoc.sdkStatus(context)) {
@@ -105,7 +93,7 @@ private fun PocScreen(
 
             val client = HealthConnectPoc.getClient(context)
             if (HealthConnectPoc.hasWritePermission(client)) {
-                writeSteps()
+                state = PocUiState.Ready
             } else {
                 state = PocUiState.RequestingPermission
                 permissionLauncher.launch(HealthConnectPoc.requiredPermissions)
@@ -113,20 +101,42 @@ private fun PocScreen(
         }
     }
 
-    LaunchedEffect(attempt) {
-        startFlow()
-    }
-
-    LaunchedEffect(pendingWriteAfterGrant) {
-        if (pendingWriteAfterGrant) {
-            pendingWriteAfterGrant = false
-            writeSteps()
+    fun runWrite(block: suspend () -> PocWriteResult) {
+        scope.launch {
+            state = PocUiState.Writing
+            runCatching {
+                val client = HealthConnectPoc.getClient(context)
+                if (!HealthConnectPoc.hasWritePermission(client)) {
+                    state = PocUiState.RequestingPermission
+                    permissionLauncher.launch(HealthConnectPoc.requiredPermissions)
+                    return@launch
+                }
+                block()
+            }.onSuccess { result ->
+                state = PocUiState.Written(result)
+            }.onFailure { error ->
+                state = PocUiState.Error(error.message ?: error::class.java.simpleName)
+            }
         }
     }
+
+    LaunchedEffect(attempt) {
+        ensureReadyOrRequestPermission()
+    }
+
+    LaunchedEffect(pendingReadyAfterGrant) {
+        if (pendingReadyAfterGrant) {
+            pendingReadyAfterGrant = false
+            state = PocUiState.Ready
+        }
+    }
+
+    val showWriteActions = state is PocUiState.Ready || state is PocUiState.Written
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
@@ -145,6 +155,13 @@ private fun PocScreen(
             text = statusText(state),
             style = MaterialTheme.typography.titleMedium,
         )
+        if (showWriteActions) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.hint_verify),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
         when (state) {
@@ -167,27 +184,45 @@ private fun PocScreen(
                     Text(text = stringResource(R.string.action_retry))
                 }
             }
-            is PocUiState.Written -> {
-                Button(
-                    onClick = openHealthConnect,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(text = stringResource(R.string.action_open_hc))
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = { writeSteps() },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(text = stringResource(R.string.action_write_again))
-                }
-            }
-            else -> {
-                // Checking / requesting / writing — no primary action yet.
-            }
+            else -> Unit
         }
 
-        if (state !is PocUiState.Written && state !is PocUiState.Checking) {
+        if (showWriteActions) {
+            Button(
+                onClick = {
+                    runWrite {
+                        HealthConnectPoc.writeOneSegment(
+                            context,
+                            HealthConnectPoc.getClient(context),
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = stringResource(R.string.action_write_one))
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = {
+                    runWrite {
+                        HealthConnectPoc.writeShortRun(
+                            context,
+                            HealthConnectPoc.getClient(context),
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = stringResource(R.string.action_write_run))
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = openHealthConnect,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = stringResource(R.string.action_open_hc))
+            }
+        } else if (state !is PocUiState.Checking && state !is PocUiState.Writing) {
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedButton(
                 onClick = openHealthConnect,
@@ -206,7 +241,13 @@ private fun statusText(state: PocUiState): String = when (state) {
     PocUiState.NeedInstall -> stringResource(R.string.status_need_install)
     PocUiState.RequestingPermission -> stringResource(R.string.status_requesting)
     PocUiState.PermissionDenied -> stringResource(R.string.status_denied)
+    PocUiState.Ready -> stringResource(R.string.status_ready)
     PocUiState.Writing -> stringResource(R.string.status_writing)
-    is PocUiState.Written -> stringResource(R.string.status_written)
+    is PocUiState.Written -> stringResource(
+        R.string.status_written,
+        state.result.segments.size,
+        state.result.totalSteps,
+        state.result.totalDistanceMeters,
+    )
     is PocUiState.Error -> stringResource(R.string.status_error, state.message)
 }

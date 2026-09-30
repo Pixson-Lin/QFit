@@ -6,6 +6,8 @@
     </queries>
 
     <uses-permission android:name="android.permission.health.WRITE_STEPS" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
 
     <application
         android:allowBackup="false"
