@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QFit PoC</string>
+    <string name="title">QFit PoC</string>
+    <string name="subtitle">No sign-in. Writes steps to Health Connect on this phone only.</string>
+    <string name="status_checking">Checking Health Connect…</string>
+    <string name="status_unavailable">Health Connect is not available on this device.</string>
+    <string name="status_need_install">Install or update Health Connect, then reopen QFit.</string>
+    <string name="status_requesting">Requesting write permission…</string>
+    <string name="status_denied">Write permission was not granted.</string>
+    <string name="status_writing">Writing 188 steps…</string>
+    <string name="status_written">Wrote 188 steps to Health Connect.</string>
+    <string name="status_error">Something went wrong: %1$s</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_open_hc">Open Health Connect</string>
+    <string name="action_write_again">Write 188 steps again</string>
+    <string name="rationale_title">Why QFit needs Health Connect</string>
+    <string name="rationale_body">QFit writes walking steps on this phone so other health apps can read them. It does not sign you in or send your Google account to the developer.</string>
+</resources>
