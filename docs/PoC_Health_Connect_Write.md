@@ -13,7 +13,18 @@
 3. Writes **one** `StepsRecord` with **188** steps (`Metadata.manualEntry()`).
 4. Shows a button that opens the **system Health Connect settings** UI.
 
-## Build / install (sideload)
+## Download prebuilt (sideload)
+
+Cursor Cloud **Artifacts** can show the APK but often has **no Download** (preview fails for `.apk`). Prefer GitHub:
+
+| File | Link |
+|---|---|
+| ZIP (~9 MB) | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-poc-debug.zip |
+| APK (~28 MB) | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-poc-debug.apk |
+
+On the PR **Files** tab, open `dist/` and use GitHub’s download control.
+
+## Build / install yourself
 
 ```bash
 export ANDROID_HOME=/opt/android-sdk   # or your SDK path
