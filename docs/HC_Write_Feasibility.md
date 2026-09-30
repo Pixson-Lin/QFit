@@ -6,7 +6,7 @@
 | Status | Feasibility confirmed (desk research + APBFit reference) |
 | Date | 2026-09-30 |
 | Audience | Owner / agents scoping QFit |
-| Reference | APBFit `HealthConnectWriter`, `HC_migration.md`, Android Health Connect docs |
+| Reference | APBFit `HealthConnectWriter`, `HC_migration.md`, Android Health Connect docs (APBFit = **read-only**; see [AGENTS.md](../AGENTS.md)) |
 
 ---
 
