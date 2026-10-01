@@ -1,25 +1,31 @@
 # QFit
 
-Android app concept: APBFit-class Health Connect step writing **without** Google Sign-In or collecting the user’s email.
+Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Connect。
 
 ## Agent rule (mandatory)
 
-**後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。**
+**後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-See [AGENTS.md](AGENTS.md). APBFit is reference-only; never modify it from QFit work.
+## Current MVP (`0.2.0-mvp`)
 
-## Status
+- Home: type / duration / start + env checkboxes (HC, notification, battery, exact alarm)
+- In-progress + cancel confirm
+- About
+- Minimal foreground run that writes steps/distance/exercise to HC
 
-- Feasibility: [docs/HC_Write_Feasibility.md](docs/HC_Write_Feasibility.md)
-- PoC app: no-login write of **188** steps + open system Health Connect — [docs/PoC_Health_Connect_Write.md](docs/PoC_Health_Connect_Write.md)
-- Install/usage visibility: [docs/Install_Usage_Visibility.md](docs/Install_Usage_Visibility.md)
+Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md)
 
-## Build PoC
+### Sideload
+
+| File | Link |
+|---|---|
+| ZIP | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-mvp-debug.zip |
+| APK | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-mvp-debug.apk |
+
+```bash
+adb install -r qfit-mvp-debug.apk
+```
 
 ```bash
 ./gradlew :app:assembleDebug
 ```
-
-## Reference
-
-[APBFit](https://github.com/Pixson-Lin/APBFit) is a prior project used only as technical reference (read-only for agents).

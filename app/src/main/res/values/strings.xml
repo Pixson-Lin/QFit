@@ -1,22 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">QFit PoC</string>
-    <string name="title">QFit PoC</string>
-    <string name="subtitle">No sign-in. Writes steps, distance, and exercise to Health Connect with non-overlapping time windows.</string>
-    <string name="status_checking">Checking Health Connect…</string>
-    <string name="status_unavailable">Health Connect is not available on this device.</string>
-    <string name="status_need_install">Install or update Health Connect, then reopen QFit.</string>
-    <string name="status_requesting">Requesting write permissions (steps, distance, exercise)…</string>
-    <string name="status_denied">Write permission was not granted.</string>
-    <string name="status_ready">Ready. Choose a write action.</string>
-    <string name="status_writing">Writing to Health Connect…</string>
-    <string name="status_written">Wrote %1$d segment(s): %2$d steps, %3$.0f m. Open Health Connect to verify.</string>
-    <string name="status_error">Something went wrong: %1$s</string>
-    <string name="action_retry">Try again</string>
-    <string name="action_open_hc">Open Health Connect</string>
-    <string name="action_write_one">Write 1 segment (188 steps)</string>
-    <string name="action_write_run">Write short run (4×188 = 752 steps)</string>
-    <string name="hint_verify">Tip: tap Write 1 segment twice quickly — totals should add (376), not merge. Then check distance / exercise in HC and your downstream app.</string>
-    <string name="rationale_title">Why QFit needs Health Connect</string>
-    <string name="rationale_body">QFit writes walking steps, distance, and exercise sessions on this phone so other health apps can read them. It does not sign you in or send your Google account to the developer.</string>
+    <string name="app_name">QFit</string>
+    <string name="app_bar_title">QFit 電子搖步機</string>
+    <string name="cd_menu">關於選單</string>
+    <string name="cd_back">返回</string>
+
+    <string name="label_type">類型</string>
+    <string name="label_choose_type">選擇類型</string>
+    <string name="label_duration">時長</string>
+    <string name="estimate_steps">%1$d 分 · 估計約 %2$s 步</string>
+    <string name="action_start">開始</string>
+    <string name="action_history">歷史紀錄</string>
+    <string name="history_later">歷史紀錄下一輪再做</string>
+    <string name="err_pick_type">請先選擇類型</string>
+    <string name="err_hc_required">需要 Health Connect 寫入權限才能開始</string>
+
+    <string name="check_hc">Health Connect</string>
+    <string name="check_notification">搖步中通知</string>
+    <string name="check_battery">電池最佳化</string>
+    <string name="check_alarm">計時</string>
+
+    <string name="in_progress_title">進行中</string>
+    <string name="label_current_steps">目前步數</string>
+    <string name="label_elapsed_total">已進行/總共</string>
+    <string name="action_cancel">取消</string>
+    <string name="cancel_title">取消這次搖步？</string>
+    <string name="cancel_body">之後不會再寫入 Health Connect。已經寫進去的步數會保留。</string>
+    <string name="cancel_confirm">確定取消</string>
+    <string name="cancel_dismiss">繼續搖步</string>
+
+    <string name="about_title">關於</string>
+    <string name="about_purpose">QFit 是電子搖步機：在這支手機上依你設定的類型與時長，把步數、距離與運動寫入 Health Connect，供其他健康／遊戲 App 讀取。不需要登入 Google 帳號，也不會把帳號交給開發者。</string>
+    <string name="about_disclaimer">免責聲明：本 App 寫入的是模擬步數資料，僅供個人測試與娛樂用途。請遵守下游 App／遊戲的使用條款。開發者不以任何方式保證第三方 App 的行為、獎勵或帳號安全。使用本 App 的風險由使用者自行承擔。</string>
+    <string name="about_author">作者：Pixson Lin</string>
+
+    <string name="rationale_title">為什麼需要 Health Connect</string>
+    <string name="rationale_body">QFit 會在這支手機寫入步數、距離與運動資料，讓其他健康 App 可以讀取。不會登入或傳送你的 Google 帳號給開發者。</string>
+
+    <string name="notif_channel_name">搖步進行中</string>
+    <string name="notif_running">QFit 搖步中</string>
+    <string name="notif_body">已寫入 %1$d 步 · 計畫 %2$d 分</string>
 </resources>

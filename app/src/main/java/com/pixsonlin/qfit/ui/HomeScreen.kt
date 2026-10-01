@@ -1,0 +1,366 @@
+package com.pixsonlin.qfit.ui
+
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
+import com.pixsonlin.qfit.R
+import com.pixsonlin.qfit.data.IntensityLevel
+import com.pixsonlin.qfit.data.RunConfigStore
+import com.pixsonlin.qfit.domain.EnvironmentChecker
+import com.pixsonlin.qfit.domain.EnvironmentStatus
+import com.pixsonlin.qfit.domain.HealthConnectWriter
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    onOpenAbout: () -> Unit,
+    onStarted: () -> Unit,
+    onStartRun: (IntensityLevel, Int) -> Unit,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
+    val config = remember { RunConfigStore(context) }
+    val envChecker = remember { EnvironmentChecker(context) }
+
+    var intensity by remember { mutableStateOf(config.getIntensityOrNull()) }
+    var durationMinutes by remember { mutableIntStateOf(config.getDurationMinutes()) }
+    var dropdownExpanded by remember { mutableStateOf(false) }
+    var env by remember {
+        mutableStateOf(
+            EnvironmentStatus(
+                healthConnectReady = false,
+                notificationsReady = false,
+                batteryReady = false,
+                exactAlarmReady = false,
+            ),
+        )
+    }
+    var refreshTick by remember { mutableIntStateOf(0) }
+    var didAutoRequestHc by remember { mutableStateOf(false) }
+
+    fun sliderFromMinutes(minutes: Int): Float {
+        val min = RunConfigStore.MIN_DURATION_MIN.toFloat()
+        val max = RunConfigStore.MAX_DURATION_MIN.toFloat()
+        return ((minutes - min) / (max - min)).coerceIn(0f, 1f)
+    }
+
+    fun minutesFromSlider(value: Float): Int {
+        val min = RunConfigStore.MIN_DURATION_MIN
+        val max = RunConfigStore.MAX_DURATION_MIN
+        return (min + (max - min) * value).roundToInt().coerceIn(min, max)
+    }
+
+    val hcPermissionLauncher = rememberLauncherForActivityResult(
+        contract = PermissionController.createRequestPermissionResultContract(),
+    ) { refreshTick += 1 }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { refreshTick += 1 }
+
+    LaunchedEffect(refreshTick) {
+        env = envChecker.status()
+    }
+
+    LaunchedEffect(Unit) {
+        env = envChecker.status()
+        val status = HealthConnectWriter.sdkStatus(context)
+        if (
+            !didAutoRequestHc &&
+            status == HealthConnectClient.SDK_AVAILABLE &&
+            !env.healthConnectReady
+        ) {
+            didAutoRequestHc = true
+            hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
+        }
+    }
+
+    val estimatedSteps = (intensity?.cadenceSpm ?: 0) * durationMinutes
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbar) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_bar_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onOpenAbout) {
+                        Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_menu))
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SectionBox {
+                Text(
+                    text = stringResource(R.string.label_type),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                ExposedDropdownMenuBox(
+                    expanded = dropdownExpanded,
+                    onExpandedChange = { dropdownExpanded = it },
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        readOnly = true,
+                        value = intensity?.menuLabel() ?: "",
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.label_choose_type)) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded)
+                        },
+                    )
+                    ExposedDropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false },
+                    ) {
+                        IntensityLevel.entries.forEach { level ->
+                            DropdownMenuItem(
+                                text = { Text(level.menuLabel()) },
+                                onClick = {
+                                    intensity = level
+                                    config.setIntensity(level)
+                                    dropdownExpanded = false
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+
+            SectionBox {
+                Text(
+                    text = stringResource(R.string.label_duration),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Slider(
+                    value = sliderFromMinutes(durationMinutes),
+                    onValueChange = {
+                        durationMinutes = minutesFromSlider(it)
+                        config.setDurationMinutes(durationMinutes)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    text = stringResource(
+                        R.string.estimate_steps,
+                        durationMinutes,
+                        if (intensity == null) "—" else estimatedSteps.toString(),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.align(Alignment.End),
+                    fontSize = 14.sp,
+                )
+            }
+
+            Button(
+                onClick = {
+                    val selected = intensity
+                    if (selected == null) {
+                        scope.launch {
+                            snackbar.showSnackbar(context.getString(R.string.err_pick_type))
+                        }
+                        return@Button
+                    }
+                    if (!env.healthConnectReady) {
+                        scope.launch {
+                            snackbar.showSnackbar(context.getString(R.string.err_hc_required))
+                        }
+                        hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
+                        return@Button
+                    }
+                    onStartRun(selected, durationMinutes)
+                    onStarted()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp),
+                shape = RoundedCornerShape(50),
+            ) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.action_start),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                StatusCheck(
+                    label = stringResource(R.string.check_hc),
+                    checked = env.healthConnectReady,
+                    onClick = {
+                        if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
+                            context.startActivity(HealthConnectWriter.settingsIntent())
+                        } else if (!env.healthConnectReady) {
+                            hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
+                        } else {
+                            context.startActivity(HealthConnectWriter.settingsIntent())
+                        }
+                        refreshTick += 1
+                    },
+                )
+                StatusCheck(
+                    label = stringResource(R.string.check_notification),
+                    checked = env.notificationsReady,
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= 33 && !env.notificationsReady) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            context.startActivity(envChecker.notificationSettingsIntent())
+                        }
+                        refreshTick += 1
+                    },
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                StatusCheck(
+                    label = stringResource(R.string.check_battery),
+                    checked = env.batteryReady,
+                    onClick = {
+                        runCatching { context.startActivity(envChecker.batteryOptimizationIntent()) }
+                        refreshTick += 1
+                    },
+                )
+                StatusCheck(
+                    label = stringResource(R.string.check_alarm),
+                    checked = env.exactAlarmReady,
+                    onClick = {
+                        context.startActivity(envChecker.exactAlarmIntent())
+                        refreshTick += 1
+                    },
+                )
+            }
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            snackbar.showSnackbar(context.getString(R.string.history_later))
+                        }
+                    },
+                    shape = RoundedCornerShape(50),
+                ) {
+                    Icon(Icons.Filled.DateRange, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_history))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionBox(content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(28.dp),
+            )
+            .padding(16.dp),
+        content = content,
+    )
+}
+
+@Composable
+private fun StatusCheck(
+    label: String,
+    checked: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(4.dp),
+    ) {
+        Checkbox(checked = checked, onCheckedChange = { onClick() })
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+    }
+}

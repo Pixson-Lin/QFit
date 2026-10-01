@@ -1,10 +1,11 @@
-# QFit PoC — Health Connect write
+# QFit PoC — Health Connect write (superseded by MVP UI)
 
 | Field | Value |
 |---|---|
-| Status | Implemented in `:app` |
+| Status | Historical — product UI is now Home / In-progress MVP (`0.2.0-mvp`) |
 | Goal | Prove no-login HC write; verify non-overlap, multi-segment, distance/exercise |
 | Package | `com.pixsonlin.qfit` |
+| See also | [MVP_Home_Decisions.md](MVP_Home_Decisions.md) |
 
 ## What it does
 
