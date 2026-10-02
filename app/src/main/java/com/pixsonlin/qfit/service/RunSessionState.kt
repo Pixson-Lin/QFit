@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 data class ActiveRunUi(
+    val runId: String,
     val intensity: IntensityLevel,
     val durationMinutes: Int,
     val startTimeMillis: Long,

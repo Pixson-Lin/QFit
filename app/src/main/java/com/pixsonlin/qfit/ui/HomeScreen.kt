@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -71,6 +72,7 @@ import kotlin.math.roundToInt
 @Composable
 fun HomeScreen(
     onOpenAbout: () -> Unit,
+    onOpenHistory: () -> Unit,
     onStarted: () -> Unit,
     onStartRun: (IntensityLevel, Int) -> Unit,
 ) {
@@ -96,17 +98,6 @@ fun HomeScreen(
     var refreshTick by remember { mutableIntStateOf(0) }
     var didAutoRequestHc by remember { mutableStateOf(false) }
 
-    fun sliderFromMinutes(minutes: Int): Float {
-        val min = RunConfigStore.MIN_DURATION_MIN.toFloat()
-        val max = RunConfigStore.MAX_DURATION_MIN.toFloat()
-        return ((minutes - min) / (max - min)).coerceIn(0f, 1f)
-    }
-
-    fun minutesFromSlider(value: Float): Int {
-        val min = RunConfigStore.MIN_DURATION_MIN
-        val max = RunConfigStore.MAX_DURATION_MIN
-        return (min + (max - min) * value).roundToInt().coerceIn(min, max)
-    }
 
     val hcPermissionLauncher = rememberLauncherForActivityResult(
         contract = PermissionController.createRequestPermissionResultContract(),
@@ -201,6 +192,8 @@ fun HomeScreen(
                 }
             }
 
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
             SectionBox {
                 Text(
                     text = stringResource(R.string.label_duration),
@@ -208,11 +201,14 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Slider(
-                    value = sliderFromMinutes(durationMinutes),
+                    value = durationMinutes.toFloat(),
                     onValueChange = {
-                        durationMinutes = minutesFromSlider(it)
+                        durationMinutes = RunConfigStore.snapToStep(it.roundToInt())
                         config.setDurationMinutes(durationMinutes)
                     },
+                    valueRange = RunConfigStore.MIN_DURATION_MIN.toFloat()..
+                        RunConfigStore.MAX_DURATION_MIN.toFloat(),
+                    steps = RunConfigStore.sliderSteps(),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
@@ -259,6 +255,8 @@ fun HomeScreen(
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -318,11 +316,7 @@ fun HomeScreen(
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Button(
-                    onClick = {
-                        scope.launch {
-                            snackbar.showSnackbar(context.getString(R.string.history_later))
-                        }
-                    },
+                    onClick = onOpenHistory,
                     shape = RoundedCornerShape(50),
                 ) {
                     Icon(Icons.Filled.DateRange, contentDescription = null)

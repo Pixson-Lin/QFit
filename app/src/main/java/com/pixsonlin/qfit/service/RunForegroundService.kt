@@ -9,21 +9,29 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.pixsonlin.qfit.MainActivity
 import com.pixsonlin.qfit.R
+import com.pixsonlin.qfit.data.HistoryRepository
 import com.pixsonlin.qfit.data.IntensityLevel
+import com.pixsonlin.qfit.data.db.RunEntity
+import com.pixsonlin.qfit.data.db.RunStatus
+import com.pixsonlin.qfit.data.db.SegmentEntity
 import com.pixsonlin.qfit.domain.HealthConnectWriter
 import com.pixsonlin.qfit.domain.SegmentGenerator
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class RunForegroundService : LifecycleService() {
     private var runJob: Job? = null
     private val generator = SegmentGenerator()
+    private var userCancelled = false
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -35,23 +43,24 @@ class RunForegroundService : LifecycleService() {
                     ?: return START_NOT_STICKY
                 startRun(intensity, durationMinutes)
             }
-            ACTION_CANCEL -> {
-                cancelRun()
-            }
+            ACTION_CANCEL -> cancelRun()
         }
         return START_STICKY
     }
 
     private fun startRun(intensity: IntensityLevel, durationMinutes: Int) {
         runJob?.cancel()
+        userCancelled = false
+        val runId = UUID.randomUUID().toString()
         val start = System.currentTimeMillis()
-        val end = start + durationMinutes * 60_000L
+        val plannedEnd = start + durationMinutes * 60_000L
         RunSessionState.setActive(
             ActiveRunUi(
+                runId = runId,
                 intensity = intensity,
                 durationMinutes = durationMinutes,
                 startTimeMillis = start,
-                endTimeMillis = end,
+                endTimeMillis = plannedEnd,
             ),
         )
         ensureChannel()
@@ -63,16 +72,19 @@ class RunForegroundService : LifecycleService() {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
             )
         } else {
+            @Suppress("DEPRECATION")
             startForeground(NOTIFICATION_ID, notification)
         }
 
         runJob = lifecycleScope.launch {
+            val pending = mutableListOf<SegmentEntity>()
             var cursor = start
             var index = 0
             var totalSteps = 0
+            var status = RunStatus.COMPLETED
             try {
-                while (isActive && cursor < end) {
-                    val remainingSec = ((end - cursor) / 1000L).toInt().coerceAtLeast(1)
+                while (isActive && cursor < plannedEnd) {
+                    val remainingSec = ((plannedEnd - cursor) / 1000L).toInt().coerceAtLeast(1)
                     val durationSec = generator.nextDurationSeconds().coerceAtMost(remainingSec)
                     val segment = generator.generate(
                         index = index,
@@ -83,17 +95,31 @@ class RunForegroundService : LifecycleService() {
                     val waitMs = (segment.endTimeMillis - System.currentTimeMillis()).coerceAtLeast(0L)
                     delay(waitMs)
                     if (!isActive) break
-                    // Integrity: never write future ends.
                     if (segment.endTimeMillis > System.currentTimeMillis()) {
                         delay(segment.endTimeMillis - System.currentTimeMillis())
                     }
-                    HealthConnectWriter.writeSegments(this@RunForegroundService, listOf(segment))
-                    totalSteps += segment.steps
+                    val writeResult = runCatching {
+                        HealthConnectWriter.writeSegments(
+                            this@RunForegroundService,
+                            listOf(segment),
+                        )
+                    }
+                    pending += SegmentEntity(
+                        runId = runId,
+                        segmentIndex = index,
+                        startTimeMillis = segment.startTimeMillis,
+                        endTimeMillis = segment.endTimeMillis,
+                        steps = segment.steps,
+                        distanceMeters = segment.distanceMeters.toDouble(),
+                        success = writeResult.isSuccess,
+                        errorMessage = writeResult.exceptionOrNull()?.message,
+                    )
+                    if (writeResult.isSuccess) {
+                        totalSteps += segment.steps
+                    }
                     index += 1
                     cursor = segment.endTimeMillis
-                    RunSessionState.update {
-                        it.copy(stepsWritten = totalSteps)
-                    }
+                    RunSessionState.update { it.copy(stepsWritten = totalSteps) }
                     val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                     nm.notify(
                         NOTIFICATION_ID,
@@ -104,12 +130,34 @@ class RunForegroundService : LifecycleService() {
                         ),
                     )
                 }
-                RunSessionState.update { it.copy(finished = true) }
+                if (userCancelled) status = RunStatus.CANCELLED
+            } catch (ce: CancellationException) {
+                status = RunStatus.CANCELLED
+                throw ce
             } catch (t: Throwable) {
+                status = RunStatus.CANCELLED
                 RunSessionState.update {
-                    it.copy(errorMessage = t.message ?: t::class.java.simpleName, finished = true)
+                    it.copy(errorMessage = t.message ?: t::class.java.simpleName)
                 }
             } finally {
+                if (userCancelled) status = RunStatus.CANCELLED
+                val endMillis = System.currentTimeMillis()
+                runCatching {
+                    HistoryRepository(this@RunForegroundService).saveRun(
+                        run = RunEntity(
+                            id = runId,
+                            intensityName = intensity.name,
+                            intensityDisplayName = intensity.displayName,
+                            plannedDurationMinutes = durationMinutes,
+                            startTimeMillis = start,
+                            endTimeMillis = endMillis,
+                            totalSteps = totalSteps,
+                            status = status.name,
+                        ),
+                        segments = pending.sortedBy { it.segmentIndex },
+                    )
+                }
+                RunSessionState.update { it.copy(finished = true) }
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -117,21 +165,20 @@ class RunForegroundService : LifecycleService() {
     }
 
     private fun cancelRun() {
+        userCancelled = true
         runJob?.cancel()
         runJob = null
-        RunSessionState.update { it.copy(finished = true) }
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
     }
 
     private fun ensureChannel() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            getString(R.string.notif_channel_name),
-            NotificationManager.IMPORTANCE_LOW,
+        nm.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notif_channel_name),
+                NotificationManager.IMPORTANCE_LOW,
+            ),
         )
-        nm.createNotificationChannel(channel)
     }
 
     private fun buildNotification(title: String, steps: Int, durationMinutes: Int): Notification {
@@ -164,7 +211,7 @@ class RunForegroundService : LifecycleService() {
                 putExtra(EXTRA_INTENSITY, intensity.name)
                 putExtra(EXTRA_DURATION_MIN, durationMinutes)
             }
-            ContextCompatStartForeground(context, intent)
+            ContextCompat.startForegroundService(context, intent)
         }
 
         fun cancel(context: Context) {
@@ -174,8 +221,4 @@ class RunForegroundService : LifecycleService() {
             context.startService(intent)
         }
     }
-}
-
-private fun ContextCompatStartForeground(context: Context, intent: Intent) {
-    androidx.core.content.ContextCompat.startForegroundService(context, intent)
 }

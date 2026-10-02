@@ -11,7 +11,6 @@
     <string name="estimate_steps">%1$d 分 · 估計約 %2$s 步</string>
     <string name="action_start">開始</string>
     <string name="action_history">歷史紀錄</string>
-    <string name="history_later">歷史紀錄下一輪再做</string>
     <string name="err_pick_type">請先選擇類型</string>
     <string name="err_hc_required">需要 Health Connect 寫入權限才能開始</string>
 
@@ -25,9 +24,23 @@
     <string name="label_elapsed_total">已進行/總共</string>
     <string name="action_cancel">取消</string>
     <string name="cancel_title">取消這次搖步？</string>
-    <string name="cancel_body">之後不會再寫入 Health Connect。已經寫進去的步數會保留。</string>
+    <string name="cancel_body">之後不會再寫入 Health Connect。已經寫進去的步數會保留，並記成「已取消」。</string>
     <string name="cancel_confirm">確定取消</string>
     <string name="cancel_dismiss">繼續搖步</string>
+
+    <string name="history_empty">還沒有搖步紀錄。</string>
+    <string name="history_start_time">搖步開始時間 : %1$s</string>
+    <string name="history_type">類型 : %1$s</string>
+    <string name="history_duration">時長 : 設定%1$s ，實際 %2$s</string>
+    <string name="history_steps">步數 : %1$d</string>
+    <string name="history_status">狀態 : %1$s</string>
+    <string name="history_details">詳細記錄</string>
+    <string name="history_no_segments">沒有段落資料。</string>
+    <string name="action_back_home">回主畫面</string>
+    <string name="action_clear_history">清空歷史</string>
+    <string name="clear_history_title">清空全部歷史？</string>
+    <string name="clear_history_body">這會刪除本機所有搖步紀錄，無法復原。Health Connect 裡已寫入的步數不會被刪除。</string>
+    <string name="clear_history_confirm">確定清空</string>
 
     <string name="about_title">關於</string>
     <string name="about_purpose">QFit 是電子搖步機：在這支手機上依你設定的類型與時長，把步數、距離與運動寫入 Health Connect，供其他健康／遊戲 App 讀取。不需要登入 Google 帳號，也不會把帳號交給開發者。</string>

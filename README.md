@@ -6,12 +6,13 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 **後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-## Current MVP (`0.2.0-mvp`)
+## Current (`0.3.0-history`)
 
-- Home: type / duration / start + env checkboxes (HC, notification, battery, exact alarm)
-- In-progress + cancel confirm
+- Home: type / duration (**5-min steps**, default 20) / start / env checkboxes / history
+- In-progress + cancel confirm (no chevrons)
+- History: Room-persisted runs, expandable 詳細記錄, clear history
 - About
-- Minimal foreground run that writes steps/distance/exercise to HC
+- Minimal foreground run → HC steps/distance/exercise
 
 Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md)
 
@@ -24,8 +25,5 @@ Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md)
 
 ```bash
 adb install -r qfit-mvp-debug.apk
-```
-
-```bash
 ./gradlew :app:assembleDebug
 ```

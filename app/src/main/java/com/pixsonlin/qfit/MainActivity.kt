@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pixsonlin.qfit.service.RunForegroundService
 import com.pixsonlin.qfit.service.RunSessionState
 import com.pixsonlin.qfit.ui.AboutScreen
+import com.pixsonlin.qfit.ui.HistoryScreen
 import com.pixsonlin.qfit.ui.HomeScreen
 import com.pixsonlin.qfit.ui.InProgressScreen
 import com.pixsonlin.qfit.ui.theme.QFitTheme
@@ -36,6 +39,7 @@ class MainActivity : ComponentActivity() {
 private object Routes {
     const val HOME = "home"
     const val IN_PROGRESS = "in_progress"
+    const val HISTORY = "history"
     const val ABOUT = "about"
 }
 
@@ -49,10 +53,38 @@ private fun QFitNav() {
         Routes.HOME
     }
 
-    NavHost(navController = navController, startDestination = start) {
+    NavHost(
+        navController = navController,
+        startDestination = start,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(280),
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(280),
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(280),
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(280),
+            )
+        },
+    ) {
         composable(Routes.HOME) {
             HomeScreen(
                 onOpenAbout = { navController.navigate(Routes.ABOUT) },
+                onOpenHistory = { navController.navigate(Routes.HISTORY) },
                 onStarted = {
                     navController.navigate(Routes.IN_PROGRESS) {
                         launchSingleTop = true
@@ -73,6 +105,12 @@ private fun QFitNav() {
                 onFinishedNavigateHome = {
                     navController.popBackStack(Routes.HOME, inclusive = false)
                 },
+            )
+        }
+        composable(Routes.HISTORY) {
+            HistoryScreen(
+                onOpenAbout = { navController.navigate(Routes.ABOUT) },
+                onBackHome = { navController.popBackStack(Routes.HOME, inclusive = false) },
             )
         }
         composable(Routes.ABOUT) {

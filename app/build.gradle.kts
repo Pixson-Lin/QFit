@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -12,8 +13,8 @@ android {
         applicationId = "com.pixsonlin.qfit"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0-mvp"
+        versionCode = 3
+        versionName = "0.3.0-history"
     }
 
     buildTypes {
@@ -61,5 +62,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.health.connect.client)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
     debugImplementation(libs.androidx.ui.tooling)
 }
