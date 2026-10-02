@@ -147,10 +147,15 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             SectionBox {
                 Text(
                     text = stringResource(R.string.label_type),
@@ -258,63 +263,76 @@ fun HomeScreen(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-            Row(
+            // 2×2 grid, each cell left-aligned
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                StatusCheck(
-                    label = stringResource(R.string.check_hc),
-                    checked = env.healthConnectReady,
-                    onClick = {
-                        if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
-                            context.startActivity(HealthConnectWriter.settingsIntent())
-                        } else if (!env.healthConnectReady) {
-                            hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
-                        } else {
-                            context.startActivity(HealthConnectWriter.settingsIntent())
-                        }
-                        refreshTick += 1
-                    },
-                )
-                StatusCheck(
-                    label = stringResource(R.string.check_notification),
-                    checked = env.notificationsReady,
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= 33 && !env.notificationsReady) {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        } else {
-                            context.startActivity(envChecker.notificationSettingsIntent())
-                        }
-                        refreshTick += 1
-                    },
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_hc),
+                        checked = env.healthConnectReady,
+                        onClick = {
+                            if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
+                                context.startActivity(HealthConnectWriter.settingsIntent())
+                            } else if (!env.healthConnectReady) {
+                                hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
+                            } else {
+                                context.startActivity(HealthConnectWriter.settingsIntent())
+                            }
+                            refreshTick += 1
+                        },
+                    )
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_notification),
+                        checked = env.notificationsReady,
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 33 && !env.notificationsReady) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                context.startActivity(envChecker.notificationSettingsIntent())
+                            }
+                            refreshTick += 1
+                        },
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_battery),
+                        checked = env.batteryReady,
+                        onClick = {
+                            runCatching { context.startActivity(envChecker.batteryOptimizationIntent()) }
+                            refreshTick += 1
+                        },
+                    )
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_alarm),
+                        checked = env.exactAlarmReady,
+                        onClick = {
+                            context.startActivity(envChecker.exactAlarmIntent())
+                            refreshTick += 1
+                        },
+                    )
+                }
             }
+            } // end scrollable column
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                contentAlignment = Alignment.CenterEnd,
             ) {
-                StatusCheck(
-                    label = stringResource(R.string.check_battery),
-                    checked = env.batteryReady,
-                    onClick = {
-                        runCatching { context.startActivity(envChecker.batteryOptimizationIntent()) }
-                        refreshTick += 1
-                    },
-                )
-                StatusCheck(
-                    label = stringResource(R.string.check_alarm),
-                    checked = env.exactAlarmReady,
-                    onClick = {
-                        context.startActivity(envChecker.exactAlarmIntent())
-                        refreshTick += 1
-                    },
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Button(
                     onClick = onOpenHistory,
                     shape = RoundedCornerShape(50),
@@ -347,12 +365,15 @@ private fun StatusCheck(
     label: String,
     checked: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        horizontalArrangement = Arrangement.Start,
+        modifier = modifier
+            .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(4.dp),
+            .padding(horizontal = 0.dp, vertical = 4.dp),
     ) {
         Checkbox(checked = checked, onCheckedChange = { onClick() })
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
