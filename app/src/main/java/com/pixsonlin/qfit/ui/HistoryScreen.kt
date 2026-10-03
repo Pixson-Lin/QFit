@@ -1,5 +1,6 @@
 package com.pixsonlin.qfit.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -186,6 +187,7 @@ private fun HistoryCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         color = MaterialTheme.colorScheme.secondaryContainer,
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
