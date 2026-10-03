@@ -74,7 +74,7 @@ fun HomeScreen(
     onOpenAbout: () -> Unit,
     onOpenHistory: () -> Unit,
     onStarted: () -> Unit,
-    onStartRun: (IntensityLevel, Int) -> Unit,
+    onStartRun: (IntensityLevel, Int, Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,6 +84,7 @@ fun HomeScreen(
 
     var intensity by remember { mutableStateOf(config.getIntensityOrNull()) }
     var durationMinutes by remember { mutableIntStateOf(config.getDurationMinutes()) }
+    var backgroundRun by remember { mutableStateOf(config.isBackgroundRunEnabled()) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     var env by remember {
         mutableStateOf(
@@ -245,7 +246,13 @@ fun HomeScreen(
                         hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
                         return@Button
                     }
-                    onStartRun(selected, durationMinutes)
+                    if (backgroundRun &&
+                        Build.VERSION.SDK_INT >= 33 &&
+                        !env.notificationsReady
+                    ) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    onStartRun(selected, durationMinutes, backgroundRun)
                     onStarted()
                 },
                 modifier = Modifier
@@ -289,13 +296,19 @@ fun HomeScreen(
                     )
                     StatusCheck(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.check_notification),
-                        checked = env.notificationsReady,
+                        label = stringResource(R.string.check_background_run),
+                        checked = backgroundRun,
                         onClick = {
-                            if (Build.VERSION.SDK_INT >= 33 && !env.notificationsReady) {
-                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            } else {
-                                context.startActivity(envChecker.notificationSettingsIntent())
+                            val next = !backgroundRun
+                            backgroundRun = next
+                            config.setBackgroundRunEnabled(next)
+                            if (next &&
+                                Build.VERSION.SDK_INT >= 33 &&
+                                !env.notificationsReady
+                            ) {
+                                notificationPermissionLauncher.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS,
+                                )
                             }
                             refreshTick += 1
                         },

@@ -15,7 +15,7 @@
     <string name="err_hc_required">需要 Health Connect 寫入權限才能開始</string>
 
     <string name="check_hc">Health Connect</string>
-    <string name="check_notification">搖步中通知</string>
+    <string name="check_background_run">背景搖步</string>
     <string name="check_battery">電池最佳化</string>
     <string name="check_alarm">計時</string>
 

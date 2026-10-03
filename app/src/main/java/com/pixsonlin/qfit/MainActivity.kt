@@ -90,8 +90,13 @@ private fun QFitNav() {
                         launchSingleTop = true
                     }
                 },
-                onStartRun = { intensity, durationMinutes ->
-                    RunForegroundService.start(context, intensity, durationMinutes)
+                onStartRun = { intensity, durationMinutes, backgroundRun ->
+                    RunForegroundService.start(
+                        context,
+                        intensity,
+                        durationMinutes,
+                        backgroundRun,
+                    )
                 },
             )
         }

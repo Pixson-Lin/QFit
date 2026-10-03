@@ -23,14 +23,24 @@ class RunConfigStore(context: Context) {
         }.apply()
     }
 
+    /** When true, run uses a foreground notification so Android is less likely to kill it. */
+    fun isBackgroundRunEnabled(): Boolean =
+        prefs.getBoolean(KEY_BACKGROUND_RUN, DEFAULT_BACKGROUND_RUN)
+
+    fun setBackgroundRunEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_BACKGROUND_RUN, enabled).apply()
+    }
+
     companion object {
         const val MIN_DURATION_MIN = 5
         const val MAX_DURATION_MIN = 240
         const val DURATION_STEP_MIN = 5
         const val DEFAULT_DURATION_MIN = 20
+        const val DEFAULT_BACKGROUND_RUN = true
         private const val PREFS = "qfit_run_config"
         private const val KEY_DURATION_MIN = "duration_minutes"
         private const val KEY_INTENSITY = "intensity"
+        private const val KEY_BACKGROUND_RUN = "background_run"
 
         fun snapToStep(minutes: Int): Int {
             val stepped =

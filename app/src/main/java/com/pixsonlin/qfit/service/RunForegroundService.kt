@@ -39,16 +39,21 @@ class RunForegroundService : LifecycleService() {
             ACTION_START -> {
                 val intensityName = intent.getStringExtra(EXTRA_INTENSITY) ?: return START_NOT_STICKY
                 val durationMinutes = intent.getIntExtra(EXTRA_DURATION_MIN, 20)
+                val backgroundRun = intent.getBooleanExtra(EXTRA_BACKGROUND_RUN, true)
                 val intensity = runCatching { IntensityLevel.valueOf(intensityName) }.getOrNull()
                     ?: return START_NOT_STICKY
-                startRun(intensity, durationMinutes)
+                startRun(intensity, durationMinutes, backgroundRun)
             }
             ACTION_CANCEL -> cancelRun()
         }
         return START_STICKY
     }
 
-    private fun startRun(intensity: IntensityLevel, durationMinutes: Int) {
+    private fun startRun(
+        intensity: IntensityLevel,
+        durationMinutes: Int,
+        backgroundRun: Boolean,
+    ) {
         runJob?.cancel()
         userCancelled = false
         val runId = UUID.randomUUID().toString()
@@ -63,17 +68,19 @@ class RunForegroundService : LifecycleService() {
                 endTimeMillis = plannedEnd,
             ),
         )
-        ensureChannel()
-        val notification = buildNotification(getString(R.string.notif_running), 0, durationMinutes)
-        if (Build.VERSION.SDK_INT >= 29) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            startForeground(NOTIFICATION_ID, notification)
+        if (backgroundRun) {
+            ensureChannel()
+            val notification = buildNotification(getString(R.string.notif_running), 0, durationMinutes)
+            if (Build.VERSION.SDK_INT >= 29) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                startForeground(NOTIFICATION_ID, notification)
+            }
         }
 
         runJob = lifecycleScope.launch {
@@ -120,15 +127,17 @@ class RunForegroundService : LifecycleService() {
                     index += 1
                     cursor = segment.endTimeMillis
                     RunSessionState.update { it.copy(stepsWritten = totalSteps) }
-                    val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    nm.notify(
-                        NOTIFICATION_ID,
-                        buildNotification(
-                            getString(R.string.notif_running),
-                            totalSteps,
-                            durationMinutes,
-                        ),
-                    )
+                    if (backgroundRun) {
+                        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                        nm.notify(
+                            NOTIFICATION_ID,
+                            buildNotification(
+                                getString(R.string.notif_running),
+                                totalSteps,
+                                durationMinutes,
+                            ),
+                        )
+                    }
                 }
                 if (userCancelled) status = RunStatus.CANCELLED
             } catch (ce: CancellationException) {
@@ -158,7 +167,9 @@ class RunForegroundService : LifecycleService() {
                     )
                 }
                 RunSessionState.update { it.copy(finished = true) }
-                stopForeground(STOP_FOREGROUND_REMOVE)
+                if (backgroundRun) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                }
                 stopSelf()
             }
         }
@@ -202,16 +213,27 @@ class RunForegroundService : LifecycleService() {
         const val ACTION_CANCEL = "com.pixsonlin.qfit.action.CANCEL_RUN"
         const val EXTRA_INTENSITY = "intensity"
         const val EXTRA_DURATION_MIN = "duration_min"
+        const val EXTRA_BACKGROUND_RUN = "background_run"
         private const val CHANNEL_ID = "qfit_run"
         private const val NOTIFICATION_ID = 42
 
-        fun start(context: Context, intensity: IntensityLevel, durationMinutes: Int) {
+        fun start(
+            context: Context,
+            intensity: IntensityLevel,
+            durationMinutes: Int,
+            backgroundRun: Boolean,
+        ) {
             val intent = Intent(context, RunForegroundService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_INTENSITY, intensity.name)
                 putExtra(EXTRA_DURATION_MIN, durationMinutes)
+                putExtra(EXTRA_BACKGROUND_RUN, backgroundRun)
             }
-            ContextCompat.startForegroundService(context, intent)
+            if (backgroundRun) {
+                ContextCompat.startForegroundService(context, intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
         fun cancel(context: Context) {
