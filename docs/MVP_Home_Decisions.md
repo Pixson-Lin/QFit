@@ -10,7 +10,7 @@
 - No Google Sign-In.
 - APBFit = read-only reference ([AGENTS.md](../AGENTS.md)).
 - Screens: Home + In-progress + History + About.
-- Minimal run writes HC steps/distance/exercise.
+- Run engine writes HC steps/distance/exercise.
 
 ## Home
 
@@ -36,12 +36,22 @@
 ## History
 
 - Persist runs + segments in **Room** (no sample data; empty state when none).
+- History list hides in-flight `RUNNING` rows.
 - Card summary: start time, type, planned vs actual duration, steps, status.
 - Card border: `1.5.dp` `primary` purple stroke for clearer separation.
-- **詳細記錄** collapsed by default; label is **green + underline**; tap expands segment lines.
-- Segment line: `#n HH:mm:ss-HH:mm:ss, N步, D公尺, 成功/失敗`.
+- **詳細記錄** collapsed by default; label is **green + underline**; tap expands segment lines (PLANNED hidden).
+- Segment line: `#n HH:mm:ss-HH:mm:ss, N步, D公尺, 成功/失敗/略過`.
 - Buttons: **回主畫面** and **清空歷史** (with confirm) on the same bottom row.
 
-## Not implemented yet
+## Run engine (Scheme C lite)
 
-- **Wall-clock catch-up / long-run stability**: segments only `delay` until each segment end. After screen-off / process freeze, there is **no** fast-forward to wall clock or burst write of missed segments.
+Ported from APBFit v1.2 ideas (single-account only):
+
+1. **Pre-plan** all segments into Room as `PLANNED` at start.
+2. **Catch-up** writes batches with `endTime <= now` (throttled: 3 batches/round, 1s gap, ≤20 segments/round).
+3. **AlarmManager** exact (or inexact + session WakeLock) for next batch deadline.
+4. **SCREEN_ON** receiver triggers catch-up when screen turns on after black screen.
+5. **Write WakeLock** around HC inserts.
+6. **Orphan resume**: cold start finds `RUNNING` → resume service; if past planned end → catch-up remaining due + finalize.
+
+Exact-alarm permission still recommended (home checkbox「計時」) for tighter schedule while screen is off.

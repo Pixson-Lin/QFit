@@ -14,10 +14,10 @@
 
 **Action:** Recorded only; no fix until reproducible.
 
-## Missing: wall-clock catch-up after doze / screen off
+## Wall-clock catch-up (0.4.0+)
 
-**Symptom:** After power button / long screen-off, returning to the app does not quickly “catch up” planned steps to wall clock.
+**Shipped** in `0.4.0-catchup` (Scheme C lite). After screen-off / Doze delay, SCREEN_ON or the next alarm should burst-write due planned segments so steps approach wall clock.
 
-**Cause:** By design of current MVP — `RunForegroundService` waits with coroutine `delay` per segment only. No logic compares wall clock to planned segment timeline and burst-writes missed intervals.
+**How to verify:** Start a run with **背景搖步** on → lock screen 2–5 minutes → unlock → In-progress steps should jump toward elapsed × cadence (not stay frozen at pre-lock value).
 
-**Action:** Future work (“長跑穩定 / 追上牆鐘”); not a regression.
+**Still weaker when:** **背景搖步** is off (no FGS notification), exact alarms revoked, or OEM kills the process aggressively — orphan resume on next app open still finalizes/catches up from Room plan.

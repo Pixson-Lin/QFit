@@ -14,10 +14,19 @@ data class RunEntity(
     val intensityDisplayName: String,
     val plannedDurationMinutes: Int,
     val startTimeMillis: Long,
+    /** Wall-clock planned end (= start + duration). */
+    val plannedEndTimeMillis: Long,
+    /** Actual end when finished; equals start while RUNNING. */
     val endTimeMillis: Long,
     val totalSteps: Int,
     val status: String,
-)
+    val batchSize: Int = DEFAULT_BATCH_SIZE,
+    val backgroundRun: Boolean = true,
+) {
+    companion object {
+        const val DEFAULT_BATCH_SIZE = 3
+    }
+}
 
 @Entity(
     tableName = "segments",
@@ -39,7 +48,8 @@ data class SegmentEntity(
     val endTimeMillis: Long,
     val steps: Int,
     val distanceMeters: Double,
-    val success: Boolean,
+    val writeStatus: String = SegmentWriteStatus.PLANNED.name,
+    val success: Boolean = false,
     val errorMessage: String? = null,
 )
 

@@ -51,6 +51,7 @@ import com.pixsonlin.qfit.data.HistoryRepository
 import com.pixsonlin.qfit.data.db.RunStatus
 import com.pixsonlin.qfit.data.db.RunWithSegments
 import com.pixsonlin.qfit.data.db.SegmentEntity
+import com.pixsonlin.qfit.data.db.SegmentWriteStatus
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -241,14 +242,17 @@ private fun HistoryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
-                    item.segments.sortedBy { it.segmentIndex }.forEach { segment ->
-                        Text(
-                            text = formatSegmentLine(segment),
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.padding(vertical = 2.dp),
-                        )
-                    }
+                    item.segments
+                        .filter { it.writeStatus != SegmentWriteStatus.PLANNED.name }
+                        .sortedBy { it.segmentIndex }
+                        .forEach { segment ->
+                            Text(
+                                text = formatSegmentLine(segment),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(vertical = 2.dp),
+                            )
+                        }
                 }
             }
         }
@@ -256,7 +260,8 @@ private fun HistoryCard(
 }
 
 private fun formatSegmentLine(segment: SegmentEntity): String {
-    val result = if (segment.success) "成功" else "失敗"
+    val result = runCatching { SegmentWriteStatus.valueOf(segment.writeStatus).displayName }
+        .getOrElse { if (segment.success) "成功" else "失敗" }
     return "#${segment.segmentIndex} ${formatTime(segment.startTimeMillis)}-" +
         "${formatTime(segment.endTimeMillis)}, ${segment.steps}步, " +
         String.format(Locale.US, "%.2f", segment.distanceMeters) + "公尺, $result"

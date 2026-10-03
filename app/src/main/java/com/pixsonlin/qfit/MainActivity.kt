@@ -9,11 +9,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pixsonlin.qfit.data.HistoryRepository
 import com.pixsonlin.qfit.service.RunForegroundService
 import com.pixsonlin.qfit.service.RunSessionState
 import com.pixsonlin.qfit.ui.AboutScreen
@@ -51,6 +53,16 @@ private fun QFitNav() {
         Routes.IN_PROGRESS
     } else {
         Routes.HOME
+    }
+
+    // Orphan RUNNING row after process death: resume service + open In-progress.
+    LaunchedEffect(Unit) {
+        if (RunSessionState.active.value?.finished == false) return@LaunchedEffect
+        val orphan = HistoryRepository(context).getRunningRun() ?: return@LaunchedEffect
+        RunForegroundService.resume(context, orphan)
+        navController.navigate(Routes.IN_PROGRESS) {
+            launchSingleTop = true
+        }
     }
 
     NavHost(
