@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
@@ -268,7 +269,11 @@ fun HomeScreen(
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            // Extra space under Start only; gap from divider to checkboxes stays spacedBy(8).
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 12.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
 
             // 2×2 grid, each cell left-aligned
             Column(
@@ -323,7 +328,19 @@ fun HomeScreen(
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
                         onClick = {
-                            runCatching { context.startActivity(envChecker.batteryOptimizationIntent()) }
+                            // Mirror HC: request when not ready; always open settings when ready
+                            // (REQUEST intent often no-ops once already exempt).
+                            runCatching {
+                                if (env.batteryReady) {
+                                    context.startActivity(envChecker.batteryOptimizationSettingsIntent())
+                                } else {
+                                    context.startActivity(envChecker.batteryOptimizationIntent())
+                                }
+                            }.recoverCatching {
+                                context.startActivity(envChecker.batteryOptimizationSettingsIntent())
+                            }.recoverCatching {
+                                context.startActivity(envChecker.appDetailsIntent())
+                            }
                             refreshTick += 1
                         },
                     )
@@ -417,6 +434,12 @@ private fun StatusCheck(
             .padding(horizontal = 0.dp, vertical = 4.dp),
     ) {
         Checkbox(checked = checked, onCheckedChange = { onClick() })
-        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }

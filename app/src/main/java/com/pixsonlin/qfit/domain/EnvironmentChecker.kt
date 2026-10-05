@@ -54,6 +54,10 @@ class EnvironmentChecker(private val context: Context) {
             data = Uri.parse("package:${context.packageName}")
         }
 
+    /** System list / settings for battery optimization (works even when already exempt). */
+    fun batteryOptimizationSettingsIntent(): Intent =
+        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+
     fun exactAlarmIntent(): Intent =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
