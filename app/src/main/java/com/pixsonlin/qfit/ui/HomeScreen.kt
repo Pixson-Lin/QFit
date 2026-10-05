@@ -8,13 +8,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -206,15 +209,12 @@ fun HomeScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
-                Slider(
-                    value = durationMinutes.toFloat(),
-                    onValueChange = {
-                        durationMinutes = RunConfigStore.snapToStep(it.roundToInt())
-                        config.setDurationMinutes(durationMinutes)
+                DurationMinutesSlider(
+                    valueMinutes = durationMinutes,
+                    onValueMinutesChange = {
+                        durationMinutes = it
+                        config.setDurationMinutes(it)
                     },
-                    valueRange = RunConfigStore.MIN_DURATION_MIN.toFloat()..
-                        RunConfigStore.MAX_DURATION_MIN.toFloat(),
-                    steps = RunConfigStore.sliderSteps(),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
@@ -371,6 +371,57 @@ private fun SectionBox(content: @Composable ColumnScope.() -> Unit) {
             .padding(16.dp),
         content = content,
     )
+}
+
+/**
+ * Time-linear duration slider: track spans 1..240 minutes evenly in time;
+ * tick marks only at [RunConfigStore.DURATION_STOPS], so short gaps (1→3)
+ * look tight and long gaps (220→240) look wide. Thumb snaps to those stops.
+ */
+@Composable
+private fun DurationMinutesSlider(
+    valueMinutes: Int,
+    onValueMinutesChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val min = RunConfigStore.MIN_DURATION_MIN.toFloat()
+    val max = RunConfigStore.MAX_DURATION_MIN.toFloat()
+    val stops = RunConfigStore.DURATION_STOPS
+    val tickColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.40f)
+    val majorTickColor = MaterialTheme.colorScheme.primary
+    // Matches Material3 Slider thumb half-width so ticks align with the track.
+    val trackInset = 10.dp
+
+    Column(modifier = modifier) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .padding(horizontal = trackInset),
+        ) {
+            val trackWidth = maxWidth
+            stops.forEach { stop ->
+                val fraction = (stop - min) / (max - min)
+                val isMajor = stop == 1 || stop == 60 || stop == 120 || stop == 240
+                Box(
+                    modifier = Modifier
+                        .offset(x = trackWidth * fraction - 0.5.dp)
+                        .width(if (isMajor) 2.dp else 1.dp)
+                        .fillMaxHeight()
+                        .background(if (isMajor) majorTickColor else tickColor),
+                )
+            }
+        }
+        Slider(
+            value = valueMinutes.toFloat().coerceIn(min, max),
+            onValueChange = { raw ->
+                onValueMinutesChange(RunConfigStore.snapToStep(raw.roundToInt()))
+            },
+            valueRange = min..max,
+            steps = 0,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @Composable

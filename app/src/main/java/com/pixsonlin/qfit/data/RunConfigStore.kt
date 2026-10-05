@@ -1,6 +1,7 @@
 package com.pixsonlin.qfit.data
 
 import android.content.Context
+import kotlin.math.abs
 
 class RunConfigStore(context: Context) {
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -32,24 +33,32 @@ class RunConfigStore(context: Context) {
     }
 
     companion object {
-        const val MIN_DURATION_MIN = 5
+        const val MIN_DURATION_MIN = 1
         const val MAX_DURATION_MIN = 240
-        const val DURATION_STEP_MIN = 5
         const val DEFAULT_DURATION_MIN = 20
         const val DEFAULT_BACKGROUND_RUN = true
+
+        /**
+         * Allowed duration stops (minutes). Visual slider is time-linear across
+         * [MIN_DURATION_MIN]..[MAX_DURATION_MIN]; thumb snaps to these values.
+         *
+         * 1, 3, 5, then +5 to 60, +10 to 120, +20 to 240 → 26 stops.
+         */
+        val DURATION_STOPS: List<Int> = buildList {
+            add(1)
+            add(3)
+            add(5)
+            for (m in 10..60 step 5) add(m)
+            for (m in 70..120 step 10) add(m)
+            for (m in 140..240 step 20) add(m)
+        }
+
         private const val PREFS = "qfit_run_config"
         private const val KEY_DURATION_MIN = "duration_minutes"
         private const val KEY_INTENSITY = "intensity"
         private const val KEY_BACKGROUND_RUN = "background_run"
 
-        fun snapToStep(minutes: Int): Int {
-            val stepped =
-                ((minutes + DURATION_STEP_MIN / 2) / DURATION_STEP_MIN) * DURATION_STEP_MIN
-            return stepped.coerceIn(MIN_DURATION_MIN, MAX_DURATION_MIN)
-        }
-
-        /** Compose Slider `steps` = discrete values between ends exclusive. */
-        fun sliderSteps(): Int =
-            ((MAX_DURATION_MIN - MIN_DURATION_MIN) / DURATION_STEP_MIN) - 1
+        fun snapToStep(minutes: Int): Int =
+            DURATION_STOPS.minBy { abs(it - minutes) }
     }
 }

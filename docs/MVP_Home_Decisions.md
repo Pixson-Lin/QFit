@@ -17,7 +17,7 @@
 | Item | Decision |
 |---|---|
 | Intensity | 5 presets; SPM: 散步 80, 超慢跑 140, 慢跑 165, 馬拉松 180, 衝刺 210 |
-| Duration | 5 min – 4 h, **step 5 min**; first-run default **20 min** |
+| Duration | Non-uniform stops **1, 3, 5, 10…60 (+5), 70…120 (+10), 140…240 (+20)** (26 values). Slider is **time-linear** with ticks only at stops. Default **20 min**. |
 | Estimate | `durationMinutes × SPM` (actual run adds segment noise) |
 | Env checkboxes | HC / battery / exact-alarm: checked = ready; tap = request / settings |
 | **背景搖步** | Preference (default **on**). On = foreground service + ongoing notification (harder for OS to kill). Off = plain service, **no notification bar**, higher chance of being killed in background. Persisted in `RunConfigStore`. Turning on may request POST_NOTIFICATIONS on API 33+. |
