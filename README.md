@@ -18,12 +18,18 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md)
 
+### User guide (GitHub Pages draft)
+
+初次執行說明（HTML，待補截圖）：[docs/index.html](docs/index.html)
+
+啟用 Pages：Settings → Pages → Deploy from branch → folder `/docs`。
+
 ### Sideload
 
 | File | Link |
 |---|---|
-| ZIP | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-mvp-debug.zip |
-| APK | https://github.com/Pixson-Lin/QFit/raw/cursor/hc-write-feasibility-fcd0/dist/qfit-mvp-debug.apk |
+| ZIP | https://github.com/Pixson-Lin/QFit/raw/main/dist/qfit-mvp-debug.zip |
+| APK | https://github.com/Pixson-Lin/QFit/raw/main/dist/qfit-mvp-debug.apk |
 
 ```bash
 adb install -r qfit-mvp-debug.apk
