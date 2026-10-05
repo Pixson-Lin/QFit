@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100506
-        versionName = "0.4.7-battery-details"
+        versionCode = 2026100507
+        versionName = "0.4.8-battery-deeplink"
     }
 
     buildTypes {

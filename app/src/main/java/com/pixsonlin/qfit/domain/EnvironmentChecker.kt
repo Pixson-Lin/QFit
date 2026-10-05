@@ -2,6 +2,7 @@ package com.pixsonlin.qfit.domain
 
 import android.Manifest
 import android.app.AlarmManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,8 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
-import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 
 data class EnvironmentStatus(
     val healthConnectReady: Boolean,
@@ -55,18 +56,60 @@ class EnvironmentChecker(private val context: Context) {
         }
 
     /**
-     * When already exempt, open this app's battery / details page instead of the
-     * system-wide optimization list (that list often hides already-unrestricted apps).
+     * Open this app's battery usage / unrestricted page when possible.
+     * Tries several deep links before falling back to app-info (where user
+     * must tap「電池」again).
      */
-    fun appBatteryOrDetailsIntent(): Intent {
-        val packageUri = Uri.parse("package:${context.packageName}")
-        val appBattery = Intent("android.settings.APP_BATTERY_SETTINGS").apply {
-            data = packageUri
+    fun openAppBatterySettings() {
+        val pkg = context.packageName
+        val packageUri = Uri.parse("package:$pkg")
+        val candidates = buildList {
+            // AOSP / Pixel: per-app battery usage (不受限制 / 最佳化 / 受限制)
+            add(
+                Intent(ACTION_APP_BATTERY_SETTINGS).apply {
+                    data = packageUri
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                },
+            )
+            add(
+                Intent(ACTION_APP_BATTERY_SETTINGS).apply {
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
+                    putExtra(Settings.EXTRA_APP_PACKAGE, pkg)
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                },
+            )
+            // Older / alternate AOSP action for advanced power usage detail
+            add(
+                Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
+                    data = packageUri
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                },
+            )
+            add(
+                Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
+                    putExtra("package", pkg)
+                    putExtra("extra_package_name", pkg)
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                },
+            )
+            // Settings activity class used on some AOSP builds
+            add(
+                Intent().apply {
+                    component = ComponentName(
+                        "com.android.settings",
+                        "com.android.settings.fuelgauge.AdvancedPowerUsageDetail",
+                    )
+                    putExtra("package", pkg)
+                    putExtra("extra_package_name", pkg)
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
+                },
+            )
+            addAll(oemAppBatteryIntents(pkg))
+            add(appDetailsIntent())
         }
-        return if (appBattery.resolveActivity(context.packageManager) != null) {
-            appBattery
-        } else {
-            appDetailsIntent()
+        for (intent in candidates) {
+            if (tryStart(intent)) return
         }
     }
 
@@ -88,4 +131,63 @@ class EnvironmentChecker(private val context: Context) {
         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.parse("package:${context.packageName}")
         }
+
+    private fun tryStart(intent: Intent): Boolean =
+        runCatching {
+            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            true
+        }.getOrDefault(false)
+
+    private fun oemAppBatteryIntents(pkg: String): List<Intent> {
+        val maker = Build.MANUFACTURER.orEmpty().lowercase()
+        return buildList {
+            if (maker.contains("samsung")) {
+                add(
+                    Intent().apply {
+                        component = ComponentName(
+                            "com.samsung.android.lool",
+                            "com.samsung.android.sm.battery.ui.BatteryActivity",
+                        )
+                    },
+                )
+                add(
+                    Intent().apply {
+                        component = ComponentName(
+                            "com.samsung.android.sm",
+                            "com.samsung.android.sm.ui.battery.BatteryActivity",
+                        )
+                    },
+                )
+            }
+            if (
+                maker.contains("xiaomi") ||
+                maker.contains("redmi") ||
+                maker.contains("poco") ||
+                maker.contains("blackshark")
+            ) {
+                add(
+                    Intent("miui.intent.action.POWER_HIDE_MODE_APP_LIST").apply {
+                        putExtra("package_name", pkg)
+                        putExtra("package_label", "QFit")
+                    },
+                )
+                add(
+                    Intent().apply {
+                        component = ComponentName(
+                            "com.miui.powerkeeper",
+                            "com.miui.powerkeeper.ui.HiddenAppsConfigActivity",
+                        )
+                        putExtra("package_name", pkg)
+                        putExtra("package_label", "QFit")
+                    },
+                )
+            }
+        }
+    }
+
+    companion object {
+        private const val ACTION_APP_BATTERY_SETTINGS = "android.settings.APP_BATTERY_SETTINGS"
+        private const val ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL =
+            "android.settings.VIEW_ADVANCED_POWER_USAGE_DETAIL"
+    }
 }

@@ -327,18 +327,16 @@ fun HomeScreen(
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
                         onClick = {
-                            // Not ready → request exemption dialog; already exempt → this app's
-                            // battery/details page (avoids system list filter confusion).
-                            runCatching {
-                                if (env.batteryReady) {
-                                    context.startActivity(envChecker.appBatteryOrDetailsIntent())
-                                } else {
+                            // Not ready → request exemption dialog; already exempt → try deep
+                            // links to this app's battery page (not just app-info).
+                            if (env.batteryReady) {
+                                envChecker.openAppBatterySettings()
+                            } else {
+                                runCatching {
                                     context.startActivity(envChecker.batteryOptimizationIntent())
+                                }.onFailure {
+                                    envChecker.openAppBatterySettings()
                                 }
-                            }.recoverCatching {
-                                context.startActivity(envChecker.appBatteryOrDetailsIntent())
-                            }.recoverCatching {
-                                context.startActivity(envChecker.appDetailsIntent())
                             }
                             refreshTick += 1
                         },
