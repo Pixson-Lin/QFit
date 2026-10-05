@@ -55,7 +55,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
@@ -434,12 +433,6 @@ private fun StatusCheck(
             .padding(horizontal = 0.dp, vertical = 4.dp),
     ) {
         Checkbox(checked = checked, onCheckedChange = { onClick() })
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
     }
 }
