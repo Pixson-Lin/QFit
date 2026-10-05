@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100511
-        versionName = "0.4.12-battery-samsung-fallback"
+        versionCode = 2026100512
+        versionName = "0.4.13-battery-app-info"
     }
 
     buildTypes {
