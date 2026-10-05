@@ -6,7 +6,7 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 **後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-## Current (`0.4.8-battery-deeplink` / `versionCode` `2026100507`)
+## Current (`0.4.9-env-resume` / `versionCode` `2026100508`)
 
 - Home: type / duration (**equal-spaced 26 stops** `1,3,5,10…240`, estimate on title row, default 20) / start / env checkboxes / **背景搖步** toggle / history
 - Default intensity: **超慢跑**
