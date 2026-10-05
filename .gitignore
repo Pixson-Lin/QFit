@@ -1,0 +1,24 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+.externalNativeBuild/
+.cxx/
+*.keystore
+!debug.keystore
+keystore.properties
+*.jks
+.kotlin/
+
+# PoC sideload binaries (explicitly tracked)
+!dist/*.apk
+!dist/*.zip
+.tmp/

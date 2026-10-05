@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QFit 使用說明 · 初次執行</title>
+  <meta name="description" content="QFit 電子搖步機：從安裝到第一次完成搖步的操作說明。" />
+  <style>
+    :root {
+      --bg: #f7f5fb;
+      --ink: #1c1526;
+      --muted: #5c5268;
+      --brand: #5b3d8f;
+      --brand-soft: #ebe4f7;
+      --card: #ffffff;
+      --line: #ddd4ea;
+      --ok: #1f7a4c;
+      --warn: #8a5a00;
+      --placeholder: #ece7f4;
+      --radius: 14px;
+      --max: 42rem;
+      --step: 1.55rem;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #e8dff8 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #f0e9dc 0%, transparent 50%),
+        var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--brand); }
+    a:hover { text-decoration-thickness: 2px; }
+
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    header.hero {
+      padding: 1.25rem 0 1.75rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 2rem;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: var(--brand);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    h1 {
+      font-size: clamp(1.7rem, 4vw, 2.2rem);
+      line-height: 1.25;
+      margin: 0 0 0.6rem;
+      color: var(--brand);
+    }
+    .lede {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    nav.toc {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin: 1.5rem 0 2rem;
+    }
+    nav.toc h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    nav.toc ol {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    nav.toc li { margin: 0.25rem 0; }
+
+    section {
+      margin: 0 0 2.4rem;
+      scroll-margin-top: 1rem;
+    }
+    section > h2 {
+      font-size: 1.35rem;
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--brand-soft);
+    }
+    section > h2 .n {
+      display: inline-block;
+      min-width: 1.7rem;
+      color: var(--brand);
+      font-variant-numeric: tabular-nums;
+    }
+
+    p, li { color: var(--ink); }
+    .note, .warn, .tip {
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    .note {
+      background: var(--brand-soft);
+      color: var(--ink);
+    }
+    .warn {
+      background: #fff4d6;
+      border: 1px solid #f0d48a;
+      color: #4a3600;
+    }
+    .tip {
+      background: #e7f6ee;
+      border: 1px solid #b9e0c8;
+      color: #143d28;
+    }
+    .note strong, .warn strong, .tip strong { font-weight: 700; }
+
+    ol.steps {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+    }
+    ol.steps > li {
+      margin: 0.55rem 0;
+    }
+
+    figure.shot {
+      margin: 1rem 0 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    figure.shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #111;
+    }
+    /* 補圖前：把 img 拿掉或保留空 src，placeholder 會顯示 */
+    .shot-placeholder {
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1.5rem;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          var(--placeholder),
+          var(--placeholder) 12px,
+          #e5dcf3 12px,
+          #e5dcf3 24px
+        );
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    figcaption {
+      padding: 0.65rem 0.9rem 0.8rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    ul.check {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0;
+    }
+    ul.check li {
+      position: relative;
+      padding: 0.35rem 0 0.35rem 1.6rem;
+    }
+    ul.check li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: #efe9f8;
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">QFit 說明書（草稿）</div>
+      <h1>初次執行操作教學</h1>
+      <p class="lede">
+        依第一次開啟 App 的順序，從安裝到完成第一次搖步。
+        截圖位置已標好，之後可直接替換 <code>images/</code> 裡的圖片。
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="目錄">
+      <h2>目錄</h2>
+      <ol>
+        <li><a href="#s0">開始之前</a></li>
+        <li><a href="#s1">安裝並開啟 QFit</a></li>
+        <li><a href="#s2">允許 Health Connect 寫入</a></li>
+        <li><a href="#s3">確認「背景搖步」</a></li>
+        <li><a href="#s4">設定「電池最佳化」為不受限制</a></li>
+        <li><a href="#s5">選擇類型與時長</a></li>
+        <li><a href="#s6">按「開始」並等待完成</a></li>
+        <li><a href="#s7">查看歷史紀錄</a></li>
+        <li><a href="#s8">常見問題</a></li>
+      </ol>
+    </nav>
+
+    <section id="s0">
+      <h2><span class="n">0.</span> 開始之前</h2>
+      <ul class="check">
+        <li>Android 手機（建議 Android 12 / API 31 以上）</li>
+        <li>已安裝 <strong>Health Connect</strong>（多數新機已內建；沒有可到 Play 商店安裝）</li>
+        <li>QFit 安裝檔（APK）。目前以側載（sideload）為主</li>
+      </ul>
+      <div class="warn">
+        <strong>重要：</strong>QFit 寫入的是<strong>模擬步數</strong>，僅供個人測試與娛樂。
+        請遵守下游健康／遊戲 App 的使用條款；使用風險由使用者自行承擔。
+      </div>
+    </section>
+
+    <section id="s1">
+      <h2><span class="n">1.</span> 安裝並開啟 QFit</h2>
+      <ol class="steps">
+        <li>用手機開啟 APK（或先傳到手機再點安裝）。</li>
+        <li>若系統提示「不允許未知來源」，到設定允許該來源後再安裝。</li>
+        <li>安裝完成後開啟 <strong>QFit</strong>，會看到主畫面：類型、時長、開始，以及下方三個勾選項目。</li>
+      </ol>
+
+      <figure class="shot">
+        <!-- 補圖：把下一行註解拿掉，並刪除 .shot-placeholder -->
+        <!-- <img src="images/01-home.png" alt="QFit 主畫面" /> -->
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/01-home.png</code><br />主畫面（類型／時長／三個勾選）
+        </div>
+        <figcaption>圖 1 · 主畫面總覽</figcaption>
+      </figure>
+    </section>
+
+    <section id="s2">
+      <h2><span class="n">2.</span> 允許 Health Connect 寫入</h2>
+      <p>
+        第一次開啟時，系統通常會<strong>自動跳出</strong> Health Connect 權限畫面。
+        請允許 QFit 寫入<strong>步數、距離、運動</strong>等資料。
+      </p>
+      <ol class="steps">
+        <li>在權限畫面勾選／允許所需項目後確認。</li>
+        <li>回到主畫面，確認 <strong>Health Connect</strong> 已打勾。</li>
+        <li>若沒有自動跳出，或之後取消了權限：點主畫面的 <strong>Health Connect</strong> 再授權一次。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/02-health-connect.png</code><br />Health Connect 授權畫面
+        </div>
+        <figcaption>圖 2 · Health Connect 權限</figcaption>
+      </figure>
+
+      <div class="tip">
+        <strong>小提醒：</strong>QFit <strong>不需要</strong>登入 Google 帳號，也不會把帳號交給開發者。
+        資料寫在這支手機的 Health Connect 裡，供其他 App 讀取。
+      </div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="n">3.</span> 確認「背景搖步」</h2>
+      <p>
+        主畫面中間的 <strong>背景搖步</strong> 預設為<strong>開啟</strong>（建議維持開啟）。
+        開啟時會在通知列顯示進行中通知，比較不容易被系統清掉後台。
+      </p>
+      <ol class="steps">
+        <li>確認 <strong>背景搖步</strong> 已打勾。</li>
+        <li>Android 13 以上若跳出「通知」權限，請允許（這樣通知列才會出現「搖步中」）。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/03-background-run.png</code><br />背景搖步已勾選（可一併拍通知權限）
+        </div>
+        <figcaption>圖 3 · 背景搖步</figcaption>
+      </figure>
+
+      <div class="note">
+        若取消「背景搖步」，就<strong>不會</strong>出現通知列，但關屏後較容易被系統殺掉，
+        步數追上牆鐘的穩定度會變差。一般使用請保持開啟。
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="n">4.</span> 設定「電池最佳化」為不受限制</h2>
+      <p>
+        這一步很重要：關屏、睡覺模式時，QFit 才比較能準時把段落步數寫進 Health Connect。
+      </p>
+      <ol class="steps">
+        <li>點主畫面的 <strong>電池最佳化</strong>。</li>
+        <li>會先出現說明視窗，內容大致是：接下來開啟應用程式資訊 → 點「電池」→ 選「不受限制」。</li>
+        <li>按 <strong>前往設定</strong>。</li>
+        <li>在 QFit 的應用程式資訊頁，點 <strong>電池</strong>。</li>
+        <li>選擇 <strong>不受限制</strong>（部分手機文案可能是「不限制」／「Unrestricted」）。</li>
+        <li>用返回鍵回到 QFit，確認 <strong>電池最佳化</strong> 已打勾。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/04a-battery-dialog.png</code><br />說明對話框
+        </div>
+        <figcaption>圖 4a · 電池設定說明</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/04b-app-info.png</code><br />應用程式資訊 → 電池
+        </div>
+        <figcaption>圖 4b · 應用程式資訊頁</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/04c-unrestricted.png</code><br />三選一：不受限制／最佳化／受限
+        </div>
+        <figcaption>圖 4c · 選「不受限制」</figcaption>
+      </figure>
+
+      <div class="warn">
+        不同品牌選單路徑可能略有差異，但目標相同：讓 QFit 的電池用量為
+        <strong>不受限制</strong>。若勾選沒立刻更新，回 App 主畫面再看一次即可（離開設定回來會自動重新檢查）。
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="n">5.</span> 選擇類型與時長</h2>
+      <ol class="steps">
+        <li><strong>類型</strong>：第一次預設是 <strong>超慢跑</strong>。可改成散步／慢跑／馬拉松／衝刺。</li>
+        <li><strong>時長</strong>：左右拖曳滑桿。第一次建議用較短時間（例如 1～5 分鐘）熟悉流程；預設約 20 分鐘。</li>
+        <li>標題列右側會顯示估計步數（分鐘 × 該類型步頻）。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/05-type-duration.png</code><br />類型下拉與時長滑桿
+        </div>
+        <figcaption>圖 5 · 類型與時長</figcaption>
+      </figure>
+    </section>
+
+    <section id="s6">
+      <h2><span class="n">6.</span> 按「開始」並等待完成</h2>
+      <ol class="steps">
+        <li>確認三個勾選都就緒後，按紫色的 <strong>開始</strong>。</li>
+        <li>進入「進行中」畫面，會看到目前步數與已進行／總共時間。</li>
+        <li>若「背景搖步」有開，通知列也會顯示搖步中。</li>
+        <li>時間到會自動結束；也可按 <strong>取消</strong>（會再確認一次）。取消後<strong>不會再寫入</strong>新的步數，但已經寫進 Health Connect 的會保留，歷史會標成「已取消」。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/06-in-progress.png</code><br />進行中畫面
+        </div>
+        <figcaption>圖 6 · 進行中</figcaption>
+      </figure>
+
+      <div class="tip">
+        <strong>建議第一次測試：</strong>設 1～3 分鐘、畫面保持開啟，看步數是否慢慢增加。
+        確認沒問題後，再試關屏／較長時間。
+      </div>
+    </section>
+
+    <section id="s7">
+      <h2><span class="n">7.</span> 查看歷史紀錄</h2>
+      <ol class="steps">
+        <li>回主畫面後，右下角按 <strong>歷史紀錄</strong>。</li>
+        <li>每一筆會顯示開始時間、類型、時長、步數、狀態（已完成／已取消）。</li>
+        <li>點綠色底線的 <strong>詳細記錄</strong> 可展開每一小段的寫入結果。</li>
+        <li>若要清空本機歷史，按 <strong>清空歷史</strong>（不會刪除 Health Connect 裡已寫入的步數）。</li>
+      </ol>
+
+      <figure class="shot">
+        <div class="shot-placeholder">
+          待補圖<br /><code>images/07-history.png</code><br />歷史紀錄列表
+        </div>
+        <figcaption>圖 7 · 歷史紀錄</figcaption>
+      </figure>
+    </section>
+
+    <section id="s8">
+      <h2><span class="n">8.</span> 常見問題</h2>
+      <p><strong>Q. Health Connect 沒打勾？</strong><br />
+        再點一次 Health Connect 授權；並確認手機已安裝 Health Connect。</p>
+      <p><strong>Q. 電池最佳化設了還是沒勾？</strong><br />
+        確認選的是「不受限制」。回到 QFit 後畫面會自動重查；仍不行可完全滑掉 App 再重開。</p>
+      <p><strong>Q. 關屏後步數好像停住？</strong><br />
+        先確認「背景搖步」與「電池最佳化」都已開啟。亮屏回來後，App 會盡量把到期段落追上牆鐘。</p>
+      <p><strong>Q. 其他 App 看不到步數？</strong><br />
+        到 Health Connect 確認該 App 有<strong>讀取</strong>權限，且資料來源包含 QFit 寫入的紀錄。</p>
+      <p><strong>Q. 左上選單是什麼？</strong><br />
+        「關於」：用途說明、免責聲明、版本號碼。</p>
+    </section>
+
+    <footer>
+      <p>QFit · 作者 Pixson Lin · 本頁為 GitHub Pages 說明書草稿，截圖請放到同目錄 <code>images/</code>。</p>
+      <p>啟用 Pages 時：Repository Settings → Pages → Deploy from branch → folder <code>/docs</code>。</p>
+    </footer>
+  </div>
+</body>
+</html>
