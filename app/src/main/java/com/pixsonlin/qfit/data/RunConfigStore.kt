@@ -18,6 +18,10 @@ class RunConfigStore(context: Context) {
         return runCatching { IntensityLevel.valueOf(name) }.getOrNull()
     }
 
+    /** First-launch default is 超慢跑 when nothing has been saved yet. */
+    fun getIntensityOrDefault(): IntensityLevel =
+        getIntensityOrNull() ?: DEFAULT_INTENSITY
+
     fun setIntensity(level: IntensityLevel?) {
         prefs.edit().apply {
             if (level == null) remove(KEY_INTENSITY) else putString(KEY_INTENSITY, level.name)
@@ -37,6 +41,7 @@ class RunConfigStore(context: Context) {
         const val MAX_DURATION_MIN = 240
         const val DEFAULT_DURATION_MIN = 20
         const val DEFAULT_BACKGROUND_RUN = true
+        val DEFAULT_INTENSITY: IntensityLevel = IntensityLevel.SUPER_SLOW_JOG
 
         /**
          * Allowed duration stops (minutes). Visual slider is time-linear across

@@ -85,7 +85,13 @@ fun HomeScreen(
     val config = remember { RunConfigStore(context) }
     val envChecker = remember { EnvironmentChecker(context) }
 
-    var intensity by remember { mutableStateOf(config.getIntensityOrNull()) }
+    var intensity by remember {
+        val initial = config.getIntensityOrDefault()
+        if (config.getIntensityOrNull() == null) {
+            config.setIntensity(initial)
+        }
+        mutableStateOf(initial)
+    }
     var durationMinutes by remember { mutableIntStateOf(config.getDurationMinutes()) }
     var backgroundRun by remember { mutableStateOf(config.isBackgroundRunEnabled()) }
     var dropdownExpanded by remember { mutableStateOf(false) }
@@ -128,7 +134,7 @@ fun HomeScreen(
         }
     }
 
-    val estimatedSteps = (intensity?.cadenceSpm ?: 0) * durationMinutes
+    val estimatedSteps = intensity.cadenceSpm * durationMinutes
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
@@ -151,14 +157,14 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
             SectionBox {
                 Text(
@@ -166,7 +172,7 @@ fun HomeScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 ExposedDropdownMenuBox(
                     expanded = dropdownExpanded,
                     onExpandedChange = { dropdownExpanded = it },
@@ -176,7 +182,7 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         readOnly = true,
-                        value = intensity?.menuLabel() ?: "",
+                        value = intensity.menuLabel(),
                         onValueChange = {},
                         label = { Text(stringResource(R.string.label_choose_type)) },
                         trailingIcon = {
@@ -201,8 +207,6 @@ fun HomeScreen(
                 }
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
             SectionBox {
                 Text(
                     text = stringResource(R.string.label_duration),
@@ -221,7 +225,7 @@ fun HomeScreen(
                     text = stringResource(
                         R.string.estimate_steps,
                         durationMinutes,
-                        if (intensity == null) "—" else estimatedSteps.toString(),
+                        estimatedSteps.toString(),
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -232,13 +236,6 @@ fun HomeScreen(
 
             Button(
                 onClick = {
-                    val selected = intensity
-                    if (selected == null) {
-                        scope.launch {
-                            snackbar.showSnackbar(context.getString(R.string.err_pick_type))
-                        }
-                        return@Button
-                    }
                     if (!env.healthConnectReady) {
                         scope.launch {
                             snackbar.showSnackbar(context.getString(R.string.err_hc_required))
@@ -252,7 +249,7 @@ fun HomeScreen(
                     ) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
-                    onStartRun(selected, durationMinutes, backgroundRun)
+                    onStartRun(intensity, durationMinutes, backgroundRun)
                     onStarted()
                 },
                 modifier = Modifier
@@ -343,7 +340,7 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp),
+                    .padding(top = 8.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 Button(
@@ -368,15 +365,16 @@ private fun SectionBox(content: @Composable ColumnScope.() -> Unit) {
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(28.dp),
             )
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         content = content,
     )
 }
 
 /**
  * Time-linear duration slider: track spans 1..240 minutes evenly in time;
- * tick marks only at [RunConfigStore.DURATION_STOPS], so short gaps (1→3)
- * look tight and long gaps (220→240) look wide. Thumb snaps to those stops.
+ * tick marks only at [RunConfigStore.DURATION_STOPS], drawn on the track midline
+ * (not above the slider). Thumb snaps to those stops. Time-linear spacing and
+ * centered ticks are independent — no conflict.
  */
 @Composable
 private fun DurationMinutesSlider(
@@ -392,24 +390,31 @@ private fun DurationMinutesSlider(
     // Matches Material3 Slider thumb half-width so ticks align with the track.
     val trackInset = 10.dp
 
-    Column(modifier = modifier) {
+    Box(modifier = modifier) {
         BoxWithConstraints(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp)
+                .matchParentSize()
                 .padding(horizontal = trackInset),
+            contentAlignment = Alignment.Center,
         ) {
             val trackWidth = maxWidth
-            stops.forEach { stop ->
-                val fraction = (stop - min) / (max - min)
-                val isMajor = stop == 1 || stop == 60 || stop == 120 || stop == 240
-                Box(
-                    modifier = Modifier
-                        .offset(x = trackWidth * fraction - 0.5.dp)
-                        .width(if (isMajor) 2.dp else 1.dp)
-                        .fillMaxHeight()
-                        .background(if (isMajor) majorTickColor else tickColor),
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp),
+            ) {
+                stops.forEach { stop ->
+                    val fraction = (stop - min) / (max - min)
+                    val isMajor = stop == 1 || stop == 60 || stop == 120 || stop == 240
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .offset(x = trackWidth * fraction - 0.5.dp)
+                            .width(if (isMajor) 2.dp else 1.dp)
+                            .fillMaxHeight()
+                            .background(if (isMajor) majorTickColor else tickColor),
+                    )
+                }
             }
         }
         Slider(
