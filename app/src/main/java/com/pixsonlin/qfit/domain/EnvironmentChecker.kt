@@ -54,9 +54,21 @@ class EnvironmentChecker(private val context: Context) {
             data = Uri.parse("package:${context.packageName}")
         }
 
-    /** System list / settings for battery optimization (works even when already exempt). */
-    fun batteryOptimizationSettingsIntent(): Intent =
-        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+    /**
+     * When already exempt, open this app's battery / details page instead of the
+     * system-wide optimization list (that list often hides already-unrestricted apps).
+     */
+    fun appBatteryOrDetailsIntent(): Intent {
+        val packageUri = Uri.parse("package:${context.packageName}")
+        val appBattery = Intent("android.settings.APP_BATTERY_SETTINGS").apply {
+            data = packageUri
+        }
+        return if (appBattery.resolveActivity(context.packageManager) != null) {
+            appBattery
+        } else {
+            appDetailsIntent()
+        }
+    }
 
     fun exactAlarmIntent(): Intent =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

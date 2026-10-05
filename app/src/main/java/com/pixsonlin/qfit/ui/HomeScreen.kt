@@ -327,16 +327,16 @@ fun HomeScreen(
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
                         onClick = {
-                            // Mirror HC: request when not ready; always open settings when ready
-                            // (REQUEST intent often no-ops once already exempt).
+                            // Not ready → request exemption dialog; already exempt → this app's
+                            // battery/details page (avoids system list filter confusion).
                             runCatching {
                                 if (env.batteryReady) {
-                                    context.startActivity(envChecker.batteryOptimizationSettingsIntent())
+                                    context.startActivity(envChecker.appBatteryOrDetailsIntent())
                                 } else {
                                     context.startActivity(envChecker.batteryOptimizationIntent())
                                 }
                             }.recoverCatching {
-                                context.startActivity(envChecker.batteryOptimizationSettingsIntent())
+                                context.startActivity(envChecker.appBatteryOrDetailsIntent())
                             }.recoverCatching {
                                 context.startActivity(envChecker.appDetailsIntent())
                             }

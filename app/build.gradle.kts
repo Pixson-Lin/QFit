@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100505
-        versionName = "0.4.6-home-polish"
+        versionCode = 2026100506
+        versionName = "0.4.7-battery-details"
     }
 
     buildTypes {
