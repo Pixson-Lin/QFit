@@ -31,4 +31,4 @@
 - `SubSettings` is **not exported** → `SecurityException` / Permission Denial from QFit.
 - Public trampoline `AdvancedPowerUsageDetailActivity` starts then Settings **crashes** (`NullPointerException` in `AppButtonsPreferenceController.updateArchiveButton`) → screen flash and return.
 
-**QFit behavior (`0.4.13+`):** On **all** OEMs, open app info and show snackbar「請點選「電池」，再選「不受限制」」— consistent UX; no manufacturer branching.
+**QFit behavior (`0.4.14+`):** On **all** OEMs, show a guide dialog first, then open app info. Snackbar cannot appear over the Settings app.

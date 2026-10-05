@@ -19,7 +19,7 @@
 | Intensity | 5 presets; SPM: 散步 80, 超慢跑 140, 慢跑 165, 馬拉松 180, 衝刺 210. **First-launch default: 超慢跑** |
 | Duration | Non-uniform **value** stops **1, 3, 5, 10…60 (+5), 70…120 (+10), 140…240 (+20)** (26). Slider ticks are **equal-spaced by stop index**. Estimate label shares the「時長」title row (end-aligned, 14sp). Default **20 min**. |
 | Estimate | `durationMinutes × SPM` (actual run adds segment noise) |
-| Env checkboxes | HC / battery / exact-alarm: checked = ready; tap = settings. **電池最佳化:** all OEMs open app info + snackbar「請點選「電池」，再選「不受限制」」(direct Battery page deep-link is blocked/unreliable on several OEMs). **Note:** `canScheduleExactAlarms()` tracks battery allowlist on many builds. |
+| Env checkboxes | HC / battery / exact-alarm: checked = ready; tap = settings. **電池最佳化:** dialog explains「點電池 → 不受限制」, then opens app info (snackbar cannot overlay Settings). **Note:** `canScheduleExactAlarms()` tracks battery allowlist on many builds. |
 | **背景搖步** | Preference (default **on**). On = foreground service + ongoing notification (harder for OS to kill). Off = plain service, **no notification bar**, higher chance of being killed in background. Persisted in `RunConfigStore`. Turning on may request POST_NOTIFICATIONS on API 33+. |
 | Health Connect | Auto-request on launch if missing; checkbox = readiness + manual jump |
 | Menu | About |

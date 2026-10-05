@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100512
-        versionName = "0.4.13-battery-app-info"
+        versionCode = 2026100513
+        versionName = "0.4.14-battery-guide-dialog"
     }
 
     buildTypes {

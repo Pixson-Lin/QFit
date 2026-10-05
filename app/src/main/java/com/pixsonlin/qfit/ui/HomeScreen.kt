@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
@@ -41,6 +42,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -66,7 +68,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pixsonlin.qfit.R
 import com.pixsonlin.qfit.data.IntensityLevel
 import com.pixsonlin.qfit.data.RunConfigStore
-import com.pixsonlin.qfit.domain.BatterySettingsOpenResult
 import com.pixsonlin.qfit.domain.EnvironmentChecker
 import com.pixsonlin.qfit.domain.EnvironmentStatus
 import com.pixsonlin.qfit.domain.HealthConnectWriter
@@ -110,6 +111,7 @@ fun HomeScreen(
     }
     var refreshTick by remember { mutableIntStateOf(0) }
     var didAutoRequestHc by remember { mutableStateOf(false) }
+    var showBatteryGuide by remember { mutableStateOf(false) }
 
 
     val hcPermissionLauncher = rememberLauncherForActivityResult(
@@ -343,19 +345,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
-                        onClick = {
-                            // Samsung: SubSettings not exported; public battery trampoline
-                            // crashes → open app info + snackbar「請點選電池」.
-                            val result = envChecker.openAppBatterySettings()
-                            if (result == BatterySettingsOpenResult.OPENED_APP_DETAILS) {
-                                scope.launch {
-                                    snackbar.showSnackbar(
-                                        context.getString(R.string.hint_tap_battery),
-                                    )
-                                }
-                            }
-                            refreshTick += 1
-                        },
+                        onClick = { showBatteryGuide = true },
                     )
                     StatusCheck(
                         modifier = Modifier.weight(1f),
@@ -386,6 +376,31 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    // Snackbar cannot overlay Settings; explain steps before leaving the app.
+    if (showBatteryGuide) {
+        AlertDialog(
+            onDismissRequest = { showBatteryGuide = false },
+            title = { Text(stringResource(R.string.battery_guide_title)) },
+            text = { Text(stringResource(R.string.battery_guide_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showBatteryGuide = false
+                        envChecker.openAppBatterySettings()
+                        refreshTick += 1
+                    },
+                ) {
+                    Text(stringResource(R.string.battery_guide_go))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBatteryGuide = false }) {
+                    Text(stringResource(R.string.battery_guide_cancel))
+                }
+            },
+        )
     }
 }
 
