@@ -343,17 +343,9 @@ fun HomeScreen(
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
                         onClick = {
-                            // Not ready → request exemption dialog; already exempt → try deep
-                            // links to this app's battery page (not just app-info).
-                            if (env.batteryReady) {
-                                envChecker.openAppBatterySettings()
-                            } else {
-                                runCatching {
-                                    context.startActivity(envChecker.batteryOptimizationIntent())
-                                }.onFailure {
-                                    envChecker.openAppBatterySettings()
-                                }
-                            }
+                            // Always open Settings → Apps → QFit → Battery
+                            // (不受限制 / 最佳化 / 受限), whether currently checked or not.
+                            envChecker.openAppBatterySettings()
                             refreshTick += 1
                         },
                     )

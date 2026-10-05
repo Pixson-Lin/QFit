@@ -19,7 +19,7 @@
 | Intensity | 5 presets; SPM: 散步 80, 超慢跑 140, 慢跑 165, 馬拉松 180, 衝刺 210. **First-launch default: 超慢跑** |
 | Duration | Non-uniform **value** stops **1, 3, 5, 10…60 (+5), 70…120 (+10), 140…240 (+20)** (26). Slider ticks are **equal-spaced by stop index**. Estimate label shares the「時長」title row (end-aligned, 14sp). Default **20 min**. |
 | Estimate | `durationMinutes × SPM` (actual run adds segment noise) |
-| Env checkboxes | HC / battery / exact-alarm: checked = ready; tap = request / settings. Battery when already exempt opens **this app’s battery/details** (not the system-wide optimization list). **Note:** `canScheduleExactAlarms()` is also true when the app is on the **battery/power allowlist**, so「計時」often appears linked to「電池最佳化」— platform behavior, not a QFit bug. |
+| Env checkboxes | HC / battery / exact-alarm: checked = ready; tap = request / settings. **電池最佳化** always opens Settings → Apps → QFit → Battery (`PowerBackgroundUsageDetail`: 不受限制 / 最佳化 / 受限). **Note:** `canScheduleExactAlarms()` is also true on the **battery allowlist**, so「計時」often tracks「電池最佳化」— platform behavior. |
 | **背景搖步** | Preference (default **on**). On = foreground service + ongoing notification (harder for OS to kill). Off = plain service, **no notification bar**, higher chance of being killed in background. Persisted in `RunConfigStore`. Turning on may request POST_NOTIFICATIONS on API 33+. |
 | Health Connect | Auto-request on launch if missing; checkbox = readiness + manual jump |
 | Menu | About |
