@@ -21,7 +21,6 @@
     <string name="battery_guide_body">接下來會開啟 QFit 的應用程式資訊頁。\n\n1. 點選「電池」\n2. 選擇「不受限制」</string>
     <string name="battery_guide_go">前往設定</string>
     <string name="battery_guide_cancel">取消</string>
-    <string name="check_alarm">計時</string>
 
     <string name="in_progress_title">進行中</string>
     <string name="label_current_steps">目前步數</string>

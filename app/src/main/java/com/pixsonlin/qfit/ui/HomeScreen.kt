@@ -293,70 +293,51 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
 
-            // 2×2 grid, each cell left-aligned
-            Column(
+            // One row: HC · 背景搖步 · 電池（計時已併入電池豁免，不再單獨顯示）
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.Top,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    StatusCheck(
-                        modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.check_hc),
-                        checked = env.healthConnectReady,
-                        onClick = {
-                            if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
-                                context.startActivity(HealthConnectWriter.settingsIntent())
-                            } else if (!env.healthConnectReady) {
-                                hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
-                            } else {
-                                context.startActivity(HealthConnectWriter.settingsIntent())
-                            }
-                            refreshTick += 1
-                        },
-                    )
-                    StatusCheck(
-                        modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.check_background_run),
-                        checked = backgroundRun,
-                        onClick = {
-                            val next = !backgroundRun
-                            backgroundRun = next
-                            config.setBackgroundRunEnabled(next)
-                            if (next &&
-                                Build.VERSION.SDK_INT >= 33 &&
-                                !env.notificationsReady
-                            ) {
-                                notificationPermissionLauncher.launch(
-                                    Manifest.permission.POST_NOTIFICATIONS,
-                                )
-                            }
-                            refreshTick += 1
-                        },
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    StatusCheck(
-                        modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.check_battery),
-                        checked = env.batteryReady,
-                        onClick = { showBatteryGuide = true },
-                    )
-                    StatusCheck(
-                        modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.check_alarm),
-                        checked = env.exactAlarmReady,
-                        onClick = {
-                            context.startActivity(envChecker.exactAlarmIntent())
-                            refreshTick += 1
-                        },
-                    )
-                }
+                StatusCheck(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.check_hc),
+                    checked = env.healthConnectReady,
+                    onClick = {
+                        if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
+                            context.startActivity(HealthConnectWriter.settingsIntent())
+                        } else if (!env.healthConnectReady) {
+                            hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
+                        } else {
+                            context.startActivity(HealthConnectWriter.settingsIntent())
+                        }
+                        refreshTick += 1
+                    },
+                )
+                StatusCheck(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.check_background_run),
+                    checked = backgroundRun,
+                    onClick = {
+                        val next = !backgroundRun
+                        backgroundRun = next
+                        config.setBackgroundRunEnabled(next)
+                        if (next &&
+                            Build.VERSION.SDK_INT >= 33 &&
+                            !env.notificationsReady
+                        ) {
+                            notificationPermissionLauncher.launch(
+                                Manifest.permission.POST_NOTIFICATIONS,
+                            )
+                        }
+                        refreshTick += 1
+                    },
+                )
+                StatusCheck(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.check_battery),
+                    checked = env.batteryReady,
+                    onClick = { showBatteryGuide = true },
+                )
             }
             } // end scrollable column
 
@@ -454,7 +435,7 @@ private fun StatusCheck(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Start,
         modifier = modifier
             .fillMaxWidth()
@@ -462,6 +443,10 @@ private fun StatusCheck(
             .padding(horizontal = 0.dp, vertical = 4.dp),
     ) {
         Checkbox(checked = checked, onCheckedChange = { onClick() })
-        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 12.dp),
+        )
     }
 }
