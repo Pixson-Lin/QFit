@@ -66,6 +66,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pixsonlin.qfit.R
 import com.pixsonlin.qfit.data.IntensityLevel
 import com.pixsonlin.qfit.data.RunConfigStore
+import com.pixsonlin.qfit.domain.BatterySettingsOpenResult
 import com.pixsonlin.qfit.domain.EnvironmentChecker
 import com.pixsonlin.qfit.domain.EnvironmentStatus
 import com.pixsonlin.qfit.domain.HealthConnectWriter
@@ -343,9 +344,16 @@ fun HomeScreen(
                         label = stringResource(R.string.check_battery),
                         checked = env.batteryReady,
                         onClick = {
-                            // Always open Settings → Apps → QFit → Battery
-                            // (不受限制 / 最佳化 / 受限), whether currently checked or not.
-                            envChecker.openAppBatterySettings()
+                            // Samsung: SubSettings not exported; public battery trampoline
+                            // crashes → open app info + snackbar「請點選電池」.
+                            val result = envChecker.openAppBatterySettings()
+                            if (result == BatterySettingsOpenResult.OPENED_APP_DETAILS) {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.hint_tap_battery),
+                                    )
+                                }
+                            }
                             refreshTick += 1
                         },
                     )

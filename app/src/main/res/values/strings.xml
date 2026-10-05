@@ -17,6 +17,7 @@
     <string name="check_hc">Health Connect</string>
     <string name="check_background_run">背景搖步</string>
     <string name="check_battery">電池最佳化</string>
+    <string name="hint_tap_battery">請點選「電池」，再選「不受限制」</string>
     <string name="check_alarm">計時</string>
 
     <string name="in_progress_title">進行中</string>

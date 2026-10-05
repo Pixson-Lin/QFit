@@ -21,3 +21,4 @@ keystore.properties
 # PoC sideload binaries (explicitly tracked)
 !dist/*.apk
 !dist/*.zip
+.tmp/

@@ -2,13 +2,11 @@ package com.pixsonlin.qfit.domain
 
 import android.Manifest
 import android.app.AlarmManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
@@ -21,6 +19,21 @@ data class EnvironmentStatus(
     val batteryReady: Boolean,
     val exactAlarmReady: Boolean,
 )
+
+/** Result of trying to open the per-app battery page. */
+enum class BatterySettingsOpenResult {
+    /** Likely landed on a battery-related page. */
+    OPENED_BATTERY_PAGE,
+
+    /**
+     * Opened app info (Settings → Apps → QFit). User must tap「電池」
+     * for the three-option page. Common on Samsung: SubSettings is not
+     * exported, and AdvancedPowerUsageDetailActivity crashes.
+     */
+    OPENED_APP_DETAILS,
+
+    FAILED,
+}
 
 class EnvironmentChecker(private val context: Context) {
     suspend fun status(): EnvironmentStatus {
@@ -65,80 +78,77 @@ class EnvironmentChecker(private val context: Context) {
     }
 
     /**
-     * Open Settings → Apps → QFit → Battery (三選一：不受限制 / 最佳化 / 受限).
-     * Confirmed on owner device as SubSettings + PowerBackgroundUsageDetail
-     * with extra_package_name=com.pixsonlin.qfit.
+     * Best-effort open of the per-app Battery page
+     * (不受限制 / 最佳化 / 受限).
+     *
+     * Samsung One UI (owner dump): `SubSettings` + `PowerBackgroundUsageDetail`
+     * is **not exported** to third-party apps. The public trampoline
+     * `AdvancedPowerUsageDetailActivity` crashes on resume (NPE in
+     * AppButtonsPreferenceController). So Samsung falls back to app info.
      */
-    fun openAppBatterySettings() {
+    fun openAppBatterySettings(): BatterySettingsOpenResult {
         val pkg = context.packageName
-        val uid = runCatching {
-            context.packageManager.getPackageUid(pkg, 0)
-        }.getOrDefault(-1)
-        val packageUri = Uri.parse("package:$pkg")
-        val fragmentArgs = Bundle().apply {
-            putString(EXTRA_PACKAGE_NAME, pkg)
-            if (uid >= 0) putInt(EXTRA_UID, uid)
-            putBoolean(EXTRA_SHOW_TIME_INFO, false)
-            putString(EXTRA_POWER_USAGE_PERCENT, "0%")
-        }
+        val packageUri = Uri.fromParts("package", pkg, null)
+        val maker = Build.MANUFACTURER.orEmpty().lowercase()
+        val samsung = maker.contains("samsung")
 
-        val candidates = buildList {
-            // Owner dump: PowerBackgroundUsageDetail via Settings SubSettings.
-            for (fragment in POWER_BACKGROUND_USAGE_FRAGMENTS) {
-                add(subSettingsIntent(fragment, fragmentArgs))
-            }
-            // AOSP trampoline used by APP_BATTERY_SETTINGS on many builds.
-            add(
-                Intent().apply {
-                    component = ComponentName(
-                        "com.android.settings",
-                        "com.android.settings.fuelgauge.AdvancedPowerUsageDetailActivity",
-                    )
-                    data = packageUri
-                },
-            )
-            add(
+        // Do NOT try SubSettings — not exported (SecurityException).
+        // Do NOT try AdvancedPowerUsageDetailActivity on Samsung — crashes
+        // Settings (flash and return). Owner log 2026-10-05.
+        if (!samsung) {
+            val batteryCandidates = listOf(
                 Intent(ACTION_APP_BATTERY_SETTINGS).apply {
                     data = packageUri
                     addCategory(Intent.CATEGORY_DEFAULT)
+                    putExtra(EXTRA_PACKAGE_NAME, pkg)
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
                 },
-            )
-            add(
                 Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
                     data = packageUri
                     addCategory(Intent.CATEGORY_DEFAULT)
+                    putExtra(EXTRA_PACKAGE_NAME, pkg)
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
                 },
             )
-            // Last resort: app info (user taps「電池」).
-            add(appDetailsIntent())
+            for (intent in batteryCandidates) {
+                if (!canResolve(intent)) {
+                    Log.d(TAG, "skip unresolved battery intent action=${intent.action}")
+                    continue
+                }
+                if (tryStart(intent)) {
+                    Log.d(TAG, "started battery intent action=${intent.action} data=${intent.data}")
+                    return BatterySettingsOpenResult.OPENED_BATTERY_PAGE
+                }
+            }
+        } else {
+            Log.d(TAG, "samsung: skip APP_BATTERY_SETTINGS trampoline (known crash)")
         }
 
-        for (intent in candidates) {
-            if (!canResolve(intent)) {
-                Log.d(
-                    TAG,
-                    "skip unresolved battery intent action=${intent.action} " +
-                        "component=${intent.component} fragment=${intent.getStringExtra(EXTRA_SHOW_FRAGMENT)}",
-                )
-                continue
+        // Stable path: app info. Highlight「電池」when the OEM supports it.
+        for (key in BATTERY_HIGHLIGHT_KEYS) {
+            val details = appDetailsIntent().apply {
+                putExtra(EXTRA_FRAGMENT_ARG_KEY, key)
+                putExtra(":settings:show_fragment_args", android.os.Bundle().apply {
+                    putString(EXTRA_FRAGMENT_ARG_KEY, key)
+                })
             }
-            if (tryStart(intent)) {
-                Log.d(
-                    TAG,
-                    "started battery intent action=${intent.action} " +
-                        "component=${intent.component} fragment=${intent.getStringExtra(EXTRA_SHOW_FRAGMENT)}",
-                )
-                return
+            if (tryStart(details)) {
+                Log.d(TAG, "started app details with highlight key=$key")
+                return BatterySettingsOpenResult.OPENED_APP_DETAILS
             }
         }
-        Log.w(TAG, "no battery settings intent worked; last resort app details")
-        tryStart(appDetailsIntent())
+        if (tryStart(appDetailsIntent())) {
+            Log.d(TAG, "started plain app details")
+            return BatterySettingsOpenResult.OPENED_APP_DETAILS
+        }
+        Log.w(TAG, "failed to open any battery/app-details settings")
+        return BatterySettingsOpenResult.FAILED
     }
 
     fun exactAlarmIntent(): Intent =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                data = Uri.parse("package:${context.packageName}")
+                data = Uri.fromParts("package", context.packageName, null)
             }
         } else {
             appDetailsIntent()
@@ -151,16 +161,7 @@ class EnvironmentChecker(private val context: Context) {
 
     fun appDetailsIntent(): Intent =
         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${context.packageName}")
-        }
-
-    private fun subSettingsIntent(fragmentClass: String, args: Bundle): Intent =
-        Intent(Intent.ACTION_MAIN).apply {
-            setClassName("com.android.settings", "com.android.settings.SubSettings")
-            putExtra(EXTRA_SHOW_FRAGMENT, fragmentClass)
-            putExtra(EXTRA_SHOW_FRAGMENT_ARGUMENTS, args)
-            // Some builds require a metrics category; harmless if ignored.
-            putExtra(EXTRA_SOURCE_METRICS_CATEGORY, METRICS_INSTALLED_APP_DETAILS)
+            data = Uri.fromParts("package", context.packageName, null)
         }
 
     private fun canResolve(intent: Intent): Boolean =
@@ -171,12 +172,7 @@ class EnvironmentChecker(private val context: Context) {
             context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             true
         }.onFailure {
-            Log.w(
-                TAG,
-                "startActivity failed action=${intent.action} component=${intent.component} " +
-                    "fragment=${intent.getStringExtra(EXTRA_SHOW_FRAGMENT)}",
-                it,
-            )
+            Log.w(TAG, "startActivity failed action=${intent.action} data=${intent.data}", it)
         }.getOrDefault(false)
 
     companion object {
@@ -184,24 +180,15 @@ class EnvironmentChecker(private val context: Context) {
         private const val ACTION_APP_BATTERY_SETTINGS = "android.settings.APP_BATTERY_SETTINGS"
         private const val ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL =
             "android.settings.VIEW_ADVANCED_POWER_USAGE_DETAIL"
-
-        private const val EXTRA_SHOW_FRAGMENT = ":settings:show_fragment"
-        private const val EXTRA_SHOW_FRAGMENT_ARGUMENTS = ":settings:show_fragment_args"
-        private const val EXTRA_SOURCE_METRICS_CATEGORY = ":settings:source_metrics"
-        private const val METRICS_INSTALLED_APP_DETAILS = 20
-
         private const val EXTRA_PACKAGE_NAME = "extra_package_name"
-        private const val EXTRA_UID = "extra_uid"
-        private const val EXTRA_SHOW_TIME_INFO = "extra_show_time_info"
-        private const val EXTRA_POWER_USAGE_PERCENT = "extra_power_usage_percent"
+        private const val EXTRA_FRAGMENT_ARG_KEY = ":settings:fragment_args_key"
 
-        /** Candidate FQCNs for the three-option app battery page. */
-        private val POWER_BACKGROUND_USAGE_FRAGMENTS = listOf(
-            "com.android.settings.fuelgauge.PowerBackgroundUsageDetail",
-            "com.android.settings.fuelgauge.batteryusage.PowerBackgroundUsageDetail",
-            "com.samsung.android.settings.fuelgauge.PowerBackgroundUsageDetail",
-            "com.samsung.android.settings.battery.PowerBackgroundUsageDetail",
-            "com.android.settings.fuelgauge.AdvancedPowerUsageDetail",
+        /** Preference keys OEMs may use for the Battery row in app info. */
+        private val BATTERY_HIGHLIGHT_KEYS = listOf(
+            "battery",
+            "battery_settings",
+            "app_battery_usage",
+            "pref_app_battery_usage",
         )
     }
 }
