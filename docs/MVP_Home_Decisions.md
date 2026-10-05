@@ -26,6 +26,11 @@
 | History button | Opens History screen |
 | Start | Requires intensity + HC write permissions |
 
+## About
+
+- Bottom of screen shows `versionName` and `versionCode` from `BuildConfig`.
+- Versioning rules: [Versioning.md](Versioning.md).
+
 ## In-progress
 
 - Rows are **display only**; **no chevrons**.

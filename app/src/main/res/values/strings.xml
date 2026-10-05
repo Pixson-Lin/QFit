@@ -46,6 +46,8 @@
     <string name="about_purpose">QFit 是電子搖步機：在這支手機上依你設定的類型與時長，把步數、距離與運動寫入 Health Connect，供其他健康／遊戲 App 讀取。不需要登入 Google 帳號，也不會把帳號交給開發者。</string>
     <string name="about_disclaimer">免責聲明：本 App 寫入的是模擬步數資料，僅供個人測試與娛樂用途。請遵守下游 App／遊戲的使用條款。開發者不以任何方式保證第三方 App 的行為、獎勵或帳號安全。使用本 App 的風險由使用者自行承擔。</string>
     <string name="about_author">作者：Pixson Lin</string>
+    <string name="about_version_name">versionName：%1$s</string>
+    <string name="about_version_code">versionCode：%1$d</string>
 
     <string name="rationale_title">為什麼需要 Health Connect</string>
     <string name="rationale_body">QFit 會在這支手機寫入步數、距離與運動資料，讓其他健康 App 可以讀取。不會登入或傳送你的 Google 帳號給開發者。</string>

@@ -13,8 +13,9 @@ android {
         applicationId = "com.pixsonlin.qfit"
         minSdk = 31
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.4.1-icon"
+        // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
+        versionCode = 2026100501
+        versionName = "0.4.2-versioning"
     }
 
     buildTypes {
@@ -38,6 +39,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
