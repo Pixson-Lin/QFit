@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100501
-        versionName = "0.4.2-versioning"
+        versionCode = 2026100502
+        versionName = "0.4.3-batch2"
     }
 
     buildTypes {

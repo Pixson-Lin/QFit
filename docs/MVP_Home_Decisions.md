@@ -52,11 +52,12 @@
 
 Ported from APBFit v1.2 ideas (single-account only):
 
-1. **Pre-plan** all segments into Room as `PLANNED` at start.
-2. **Catch-up** writes batches with `endTime <= now` (throttled: 3 batches/round, 1s gap, ≤20 segments/round).
-3. **AlarmManager** exact (or inexact + session WakeLock) for next batch deadline.
-4. **SCREEN_ON** receiver triggers catch-up when screen turns on after black screen.
+1. **Pre-plan** all segments into Room as `PLANNED` at start (each segment ~25–35s).
+2. **Write when due:** `endTime <= now`, in batches of **`batchSize = 2`** (fixed; no user UI).
+3. **Wake strategy (not fixed-interval polling):**
+   - Next AlarmManager deadline = **max `endTime` of the next up-to-`batchSize` PLANNED segments** (capped by planned session end).
+   - While the process is alive, the service also `awaitUntil(deadline)` in ≤5s chunks.
+   - Extra catch-up triggers: `SCREEN_ON`, and orphan resume on cold start.
+4. **Catch-up throttle** when behind wall clock: 3 batches/round, 1s gap, ≤20 segments/round.
 5. **Write WakeLock** around HC inserts.
-6. **Orphan resume**: cold start finds `RUNNING` → resume service; if past planned end → catch-up remaining due + finalize.
-
-Exact-alarm permission still recommended (home checkbox「計時」) for tighter schedule while screen is off.
+6. Exact-alarm permission still recommended (home「計時」) for tighter schedule while screen is off.

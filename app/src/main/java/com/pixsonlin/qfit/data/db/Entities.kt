@@ -24,7 +24,7 @@ data class RunEntity(
     val backgroundRun: Boolean = true,
 ) {
     companion object {
-        const val DEFAULT_BATCH_SIZE = 3
+        const val DEFAULT_BATCH_SIZE = 2
     }
 }
 
