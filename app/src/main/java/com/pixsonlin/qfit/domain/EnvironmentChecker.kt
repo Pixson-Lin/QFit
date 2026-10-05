@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
@@ -21,12 +22,24 @@ data class EnvironmentStatus(
 )
 
 class EnvironmentChecker(private val context: Context) {
-    suspend fun status(): EnvironmentStatus = EnvironmentStatus(
-        healthConnectReady = HealthConnectWriter.hasWritePermission(context),
-        notificationsReady = areNotificationsEnabled(),
-        batteryReady = isBatteryOptimizationDisabled(),
-        exactAlarmReady = canScheduleExactAlarms(),
-    )
+    suspend fun status(): EnvironmentStatus {
+        val status = EnvironmentStatus(
+            healthConnectReady = HealthConnectWriter.hasWritePermission(context),
+            notificationsReady = areNotificationsEnabled(),
+            batteryReady = isBatteryOptimizationDisabled(),
+            exactAlarmReady = canScheduleExactAlarms(),
+        )
+        // Platform note: canScheduleExactAlarms() is also true when the app is on the
+        // battery/power allowlist — so「計時」often tracks「電池最佳化」even though
+        // they are different settings UIs.
+        Log.d(
+            TAG,
+            "env battery=${status.batteryReady} exactAlarm=${status.exactAlarmReady} " +
+                "hc=${status.healthConnectReady} notif=${status.notificationsReady} " +
+                "maker=${Build.MANUFACTURER} sdk=${Build.VERSION.SDK_INT}",
+        )
+        return status
+    }
 
     fun areNotificationsEnabled(): Boolean {
         if (Build.VERSION.SDK_INT >= 33) {
@@ -56,61 +69,53 @@ class EnvironmentChecker(private val context: Context) {
         }
 
     /**
-     * Open this app's battery usage / unrestricted page when possible.
-     * Tries several deep links before falling back to app-info (where user
-     * must tap「電池」again).
+     * Open this app's battery usage page when possible.
+     * Only starts intents that resolve; skips known flash-and-finish paths on OEMs.
      */
     fun openAppBatterySettings() {
         val pkg = context.packageName
         val packageUri = Uri.parse("package:$pkg")
+        val maker = Build.MANUFACTURER.orEmpty().lowercase()
         val candidates = buildList {
-            // AOSP / Pixel: per-app battery usage (不受限制 / 最佳化 / 受限制)
-            add(
-                Intent(ACTION_APP_BATTERY_SETTINGS).apply {
-                    data = packageUri
-                    addCategory(Intent.CATEGORY_DEFAULT)
-                },
-            )
-            add(
-                Intent(ACTION_APP_BATTERY_SETTINGS).apply {
-                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
-                    putExtra(Settings.EXTRA_APP_PACKAGE, pkg)
-                    addCategory(Intent.CATEGORY_DEFAULT)
-                },
-            )
-            // Older / alternate AOSP action for advanced power usage detail
-            add(
-                Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
-                    data = packageUri
-                    addCategory(Intent.CATEGORY_DEFAULT)
-                },
-            )
-            add(
-                Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
-                    putExtra("package", pkg)
-                    putExtra("extra_package_name", pkg)
-                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
-                    addCategory(Intent.CATEGORY_DEFAULT)
-                },
-            )
-            // Settings activity class used on some AOSP builds
-            add(
-                Intent().apply {
-                    component = ComponentName(
-                        "com.android.settings",
-                        "com.android.settings.fuelgauge.AdvancedPowerUsageDetail",
-                    )
-                    putExtra("package", pkg)
-                    putExtra("extra_package_name", pkg)
-                    putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
-                },
-            )
-            addAll(oemAppBatteryIntents(pkg))
+            // Samsung One UI: AOSP APP_BATTERY_SETTINGS often starts then immediately
+            // finishes (screen flash). Prefer app-info / Device Care battery.
+            if (!maker.contains("samsung")) {
+                add(
+                    Intent(ACTION_APP_BATTERY_SETTINGS).apply {
+                        data = packageUri
+                        addCategory(Intent.CATEGORY_DEFAULT)
+                    },
+                )
+                add(
+                    Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
+                        data = packageUri
+                        addCategory(Intent.CATEGORY_DEFAULT)
+                    },
+                )
+                add(
+                    Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL).apply {
+                        putExtra("package", pkg)
+                        putExtra("extra_package_name", pkg)
+                        putExtra(Intent.EXTRA_PACKAGE_NAME, pkg)
+                        addCategory(Intent.CATEGORY_DEFAULT)
+                    },
+                )
+            }
+            addAll(oemAppBatteryIntents(pkg, maker))
             add(appDetailsIntent())
         }
         for (intent in candidates) {
-            if (tryStart(intent)) return
+            if (!canResolve(intent)) {
+                Log.d(TAG, "skip unresolved battery intent action=${intent.action} component=${intent.component}")
+                continue
+            }
+            if (tryStart(intent)) {
+                Log.d(TAG, "started battery intent action=${intent.action} component=${intent.component}")
+                return
+            }
         }
+        Log.w(TAG, "no battery settings intent worked; last resort app details")
+        tryStart(appDetailsIntent())
     }
 
     fun exactAlarmIntent(): Intent =
@@ -132,60 +137,64 @@ class EnvironmentChecker(private val context: Context) {
             data = Uri.parse("package:${context.packageName}")
         }
 
+    private fun canResolve(intent: Intent): Boolean =
+        intent.resolveActivity(context.packageManager) != null
+
     private fun tryStart(intent: Intent): Boolean =
         runCatching {
             context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             true
+        }.onFailure {
+            Log.w(TAG, "startActivity failed action=${intent.action} component=${intent.component}", it)
         }.getOrDefault(false)
 
-    private fun oemAppBatteryIntents(pkg: String): List<Intent> {
-        val maker = Build.MANUFACTURER.orEmpty().lowercase()
-        return buildList {
-            if (maker.contains("samsung")) {
-                add(
-                    Intent().apply {
-                        component = ComponentName(
-                            "com.samsung.android.lool",
-                            "com.samsung.android.sm.battery.ui.BatteryActivity",
-                        )
-                    },
-                )
-                add(
-                    Intent().apply {
-                        component = ComponentName(
-                            "com.samsung.android.sm",
-                            "com.samsung.android.sm.ui.battery.BatteryActivity",
-                        )
-                    },
-                )
-            }
-            if (
-                maker.contains("xiaomi") ||
-                maker.contains("redmi") ||
-                maker.contains("poco") ||
-                maker.contains("blackshark")
-            ) {
-                add(
-                    Intent("miui.intent.action.POWER_HIDE_MODE_APP_LIST").apply {
-                        putExtra("package_name", pkg)
-                        putExtra("package_label", "QFit")
-                    },
-                )
-                add(
-                    Intent().apply {
-                        component = ComponentName(
-                            "com.miui.powerkeeper",
-                            "com.miui.powerkeeper.ui.HiddenAppsConfigActivity",
-                        )
-                        putExtra("package_name", pkg)
-                        putExtra("package_label", "QFit")
-                    },
-                )
-            }
+    private fun oemAppBatteryIntents(pkg: String, maker: String): List<Intent> = buildList {
+        if (maker.contains("samsung")) {
+            // Device Care battery hub (may still not be per-app; better than flash).
+            add(
+                Intent().apply {
+                    component = ComponentName(
+                        "com.samsung.android.lool",
+                        "com.samsung.android.sm.battery.ui.BatteryActivity",
+                    )
+                },
+            )
+            add(
+                Intent().apply {
+                    component = ComponentName(
+                        "com.samsung.android.sm",
+                        "com.samsung.android.sm.ui.battery.BatteryActivity",
+                    )
+                },
+            )
+        }
+        if (
+            maker.contains("xiaomi") ||
+            maker.contains("redmi") ||
+            maker.contains("poco") ||
+            maker.contains("blackshark")
+        ) {
+            add(
+                Intent("miui.intent.action.POWER_HIDE_MODE_APP_LIST").apply {
+                    putExtra("package_name", pkg)
+                    putExtra("package_label", "QFit")
+                },
+            )
+            add(
+                Intent().apply {
+                    component = ComponentName(
+                        "com.miui.powerkeeper",
+                        "com.miui.powerkeeper.ui.HiddenAppsConfigActivity",
+                    )
+                    putExtra("package_name", pkg)
+                    putExtra("package_label", "QFit")
+                },
+            )
         }
     }
 
     companion object {
+        private const val TAG = "QFit_Env"
         private const val ACTION_APP_BATTERY_SETTINGS = "android.settings.APP_BATTERY_SETTINGS"
         private const val ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL =
             "android.settings.VIEW_ADVANCED_POWER_USAGE_DETAIL"

@@ -14,8 +14,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100508
-        versionName = "0.4.9-env-resume"
+        versionCode = 2026100509
+        versionName = "0.4.10-env-clarify"
     }
 
     buildTypes {
