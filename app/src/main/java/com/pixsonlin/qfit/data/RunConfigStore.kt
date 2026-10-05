@@ -44,8 +44,7 @@ class RunConfigStore(context: Context) {
         val DEFAULT_INTENSITY: IntensityLevel = IntensityLevel.SUPER_SLOW_JOG
 
         /**
-         * Allowed duration stops (minutes). Visual slider is time-linear across
-         * [MIN_DURATION_MIN]..[MAX_DURATION_MIN]; thumb snaps to these values.
+         * Allowed duration stops (minutes), shown with equal visual spacing on the slider.
          *
          * 1, 3, 5, then +5 to 60, +10 to 120, +20 to 240 → 26 stops.
          */

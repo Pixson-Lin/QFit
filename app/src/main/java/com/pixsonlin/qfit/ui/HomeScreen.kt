@@ -8,16 +8,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -29,11 +26,11 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +67,7 @@ import com.pixsonlin.qfit.domain.EnvironmentStatus
 import com.pixsonlin.qfit.domain.HealthConnectWriter
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,11 +206,27 @@ fun HomeScreen(
             }
 
             SectionBox {
-                Text(
-                    text = stringResource(R.string.label_duration),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_duration),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = stringResource(
+                            R.string.estimate_steps,
+                            durationMinutes,
+                            estimatedSteps.toString(),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontSize = 14.sp,
+                    )
+                }
                 DurationMinutesSlider(
                     valueMinutes = durationMinutes,
                     onValueMinutesChange = {
@@ -220,17 +234,6 @@ fun HomeScreen(
                         config.setDurationMinutes(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                )
-                Text(
-                    text = stringResource(
-                        R.string.estimate_steps,
-                        durationMinutes,
-                        estimatedSteps.toString(),
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.align(Alignment.End),
-                    fontSize = 14.sp,
                 )
             }
 
@@ -371,10 +374,9 @@ private fun SectionBox(content: @Composable ColumnScope.() -> Unit) {
 }
 
 /**
- * Time-linear duration slider: track spans 1..240 minutes evenly in time;
- * tick marks only at [RunConfigStore.DURATION_STOPS], drawn on the track midline
- * (not above the slider). Thumb snaps to those stops. Time-linear spacing and
- * centered ticks are independent — no conflict.
+ * Equal-spaced duration slider over [RunConfigStore.DURATION_STOPS].
+ * Track position is by stop index (not wall-clock minutes), so each tick
+ * gap looks the same; thumb snaps to the stop list.
  */
 @Composable
 private fun DurationMinutesSlider(
@@ -382,51 +384,21 @@ private fun DurationMinutesSlider(
     onValueMinutesChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val min = RunConfigStore.MIN_DURATION_MIN.toFloat()
-    val max = RunConfigStore.MAX_DURATION_MIN.toFloat()
     val stops = RunConfigStore.DURATION_STOPS
-    val tickColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.40f)
-    val majorTickColor = MaterialTheme.colorScheme.primary
-    // Matches Material3 Slider thumb half-width so ticks align with the track.
-    val trackInset = 10.dp
+    val lastIndex = (stops.size - 1).coerceAtLeast(0)
+    val index = stops.indexOf(valueMinutes).let { if (it >= 0) it else stops.indexOf(RunConfigStore.snapToStep(valueMinutes)) }
+        .coerceIn(0, lastIndex)
 
-    Box(modifier = modifier) {
-        BoxWithConstraints(
-            modifier = Modifier
-                .matchParentSize()
-                .padding(horizontal = trackInset),
-            contentAlignment = Alignment.Center,
-        ) {
-            val trackWidth = maxWidth
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp),
-            ) {
-                stops.forEach { stop ->
-                    val fraction = (stop - min) / (max - min)
-                    val isMajor = stop == 1 || stop == 60 || stop == 120 || stop == 240
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .offset(x = trackWidth * fraction - 0.5.dp)
-                            .width(if (isMajor) 2.dp else 1.dp)
-                            .fillMaxHeight()
-                            .background(if (isMajor) majorTickColor else tickColor),
-                    )
-                }
-            }
-        }
-        Slider(
-            value = valueMinutes.toFloat().coerceIn(min, max),
-            onValueChange = { raw ->
-                onValueMinutesChange(RunConfigStore.snapToStep(raw.roundToInt()))
-            },
-            valueRange = min..max,
-            steps = 0,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    Slider(
+        value = index.toFloat(),
+        onValueChange = { raw ->
+            val next = raw.roundToInt().coerceIn(0, lastIndex)
+            onValueMinutesChange(stops[next])
+        },
+        valueRange = 0f..lastIndex.toFloat(),
+        steps = (lastIndex - 1).coerceAtLeast(0),
+        modifier = modifier,
+    )
 }
 
 @Composable
