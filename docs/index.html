@@ -137,7 +137,9 @@
     }
 
     figure.shot {
-      margin: 1rem 0 1.25rem;
+      /* Phone screenshots: keep modest on-page size (files stay full-res). */
+      max-width: min(20rem, 100%);
+      margin: 1rem auto 1.25rem;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
