@@ -151,25 +151,6 @@
       height: auto;
       background: #111;
     }
-    /* 補圖前：把 img 拿掉或保留空 src，placeholder 會顯示 */
-    .shot-placeholder {
-      min-height: 220px;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 1.5rem;
-      background:
-        repeating-linear-gradient(
-          -45deg,
-          var(--placeholder),
-          var(--placeholder) 12px,
-          #e5dcf3 12px,
-          #e5dcf3 24px
-        );
-      color: var(--muted);
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
     figcaption {
       padding: 0.65rem 0.9rem 0.8rem;
       font-size: 0.88rem;
@@ -213,11 +194,10 @@
 <body>
   <div class="wrap">
     <header class="hero">
-      <div class="eyebrow">QFit 說明書（草稿）</div>
+      <div class="eyebrow">QFit 使用說明</div>
       <h1>初次執行操作教學</h1>
       <p class="lede">
-        依第一次開啟 App 的順序，從安裝到完成第一次搖步。
-        截圖位置已標好，之後可直接替換 <code>images/</code> 裡的圖片。
+        依第一次開啟 App 的順序，從安裝、完成必要設定，到跑完第一次搖步。
       </p>
     </header>
 
@@ -239,22 +219,22 @@
     <section id="s0">
       <h2><span class="n">0.</span> 開始之前</h2>
       <ul class="check">
-        <li>Android 手機（建議 Android 12 / API 31 以上）</li>
+        <li>Android 手機（建議 Android 12 以上）</li>
         <li>已安裝 <strong>Health Connect</strong>（多數新機已內建；沒有可到 Play 商店安裝）</li>
-        <li>QFit 安裝檔（APK）。目前以側載（sideload）為主</li>
+        <li>QFit 的安裝檔（APK）</li>
       </ul>
       <div class="warn">
-        <strong>重要：</strong>QFit 寫入的是<strong>模擬步數</strong>，僅供個人測試與娛樂。
-        請遵守下游健康／遊戲 App 的使用條款；使用風險由使用者自行承擔。
+        <strong>請先了解：</strong>QFit 寫入的是<strong>模擬步數</strong>，僅供個人測試與娛樂。
+        請遵守你使用的健康／遊戲 App 之條款；使用風險由使用者自行承擔。
       </div>
     </section>
 
     <section id="s1">
       <h2><span class="n">1.</span> 安裝並開啟 QFit</h2>
       <ol class="steps">
-        <li>用手機開啟 APK（或先傳到手機再點安裝）。</li>
+        <li>把 APK 傳到手機後點選安裝。</li>
         <li>若系統提示「不允許未知來源」，到設定允許該來源後再安裝。</li>
-        <li>安裝完成後開啟 <strong>QFit</strong>，會看到主畫面：類型、時長、開始，以及下方三個勾選項目。</li>
+        <li>安裝完成後開啟 <strong>QFit</strong>。主畫面可設定類型與時長，下方有三個環境勾選，右下角可進入歷史紀錄。</li>
       </ol>
 
       <figure class="shot">
@@ -270,9 +250,9 @@
         請允許 QFit 寫入<strong>步數、距離、運動</strong>等資料。
       </p>
       <ol class="steps">
-        <li>在權限畫面勾選／允許所需項目後確認。</li>
+        <li>在權限畫面允許所需項目（可使用「全部允許」）後按「允許」。</li>
         <li>回到主畫面，確認 <strong>Health Connect</strong> 已打勾。</li>
-        <li>若沒有自動跳出，或之後取消了權限：點主畫面的 <strong>Health Connect</strong> 再授權一次。</li>
+        <li>若沒有自動跳出，或之後取消了權限：點主畫面的 <strong>Health Connect</strong>，再完成一次授權。</li>
       </ol>
 
       <figure class="shot">
@@ -289,37 +269,37 @@
     <section id="s3">
       <h2><span class="n">3.</span> 確認「背景搖步」</h2>
       <p>
-        主畫面中間的 <strong>背景搖步</strong> 預設為<strong>開啟</strong>（建議維持開啟）。
-        開啟時會在通知列顯示進行中通知，比較不容易被系統清掉後台。
+        主畫面上的 <strong>背景搖步</strong> 預設為<strong>開啟</strong>，建議維持開啟。
+        開啟時會在通知列顯示「搖步中」，比較不容易被系統清掉後台。
       </p>
       <ol class="steps">
         <li>確認 <strong>背景搖步</strong> 已打勾。</li>
-        <li>Android 13 以上若跳出「通知」權限，請允許（這樣通知列才會出現「搖步中」）。</li>
+        <li>若系統詢問是否允許通知，請選「允許」（Android 13 以上較常見）。</li>
       </ol>
 
       <figure class="shot">
-        <img src="images/03-background-run.png" alt="背景搖步已勾選" />
-        <figcaption>圖 3 · 背景搖步</figcaption>
+        <img src="images/03-background-run.png" alt="允許 QFit 傳送通知" />
+        <figcaption>圖 3 · 允許通知（背景搖步）</figcaption>
       </figure>
 
       <div class="note">
-        若取消「背景搖步」，就<strong>不會</strong>出現通知列，但關屏後較容易被系統殺掉，
-        步數追上牆鐘的穩定度會變差。一般使用請保持開啟。
+        若關閉「背景搖步」，就<strong>不會</strong>出現通知列，關屏後也較容易被系統結束，
+        寫入步數可能較不穩定。一般使用請保持開啟。
       </div>
     </section>
 
     <section id="s4">
       <h2><span class="n">4.</span> 設定「電池最佳化」為不受限制</h2>
       <p>
-        這一步很重要：關屏、睡覺模式時，QFit 才比較能準時把段落步數寫進 Health Connect。
+        這一步很重要。設成「不受限制」後，關屏時 QFit 比較能持續把步數寫進 Health Connect。
       </p>
       <ol class="steps">
         <li>點主畫面的 <strong>電池最佳化</strong>。</li>
-        <li>會先出現說明視窗，內容大致是：接下來開啟應用程式資訊 → 點「電池」→ 選「不受限制」。</li>
+        <li>會先出現說明視窗，說明接下來要做的兩步：點「電池」→ 選「不受限制」。</li>
         <li>按 <strong>前往設定</strong>。</li>
         <li>在 QFit 的應用程式資訊頁，點 <strong>電池</strong>。</li>
-        <li>選擇 <strong>不受限制</strong>（部分手機文案可能是「不限制」／「Unrestricted」）。</li>
-        <li>用返回鍵回到 QFit，確認 <strong>電池最佳化</strong> 已打勾。</li>
+        <li>選擇 <strong>不受限制</strong>（部分手機顯示為「不限制」或 Unrestricted）。</li>
+        <li>返回 QFit，確認 <strong>電池最佳化</strong> 已打勾。</li>
       </ol>
 
       <figure class="shot">
@@ -338,17 +318,17 @@
       </figure>
 
       <div class="warn">
-        不同品牌選單路徑可能略有差異，但目標相同：讓 QFit 的電池用量為
-        <strong>不受限制</strong>。若勾選沒立刻更新，回 App 主畫面再看一次即可（離開設定回來會自動重新檢查）。
+        不同品牌的選單名稱可能略有差異，目標都是把 QFit 的電池用量設成
+        <strong>不受限制</strong>。若勾選沒立刻更新，回到主畫面再看一次即可。
       </div>
     </section>
 
     <section id="s5">
       <h2><span class="n">5.</span> 選擇類型與時長</h2>
       <ol class="steps">
-        <li><strong>類型</strong>：第一次預設是 <strong>超慢跑</strong>。可改成散步／慢跑／馬拉松／衝刺。</li>
-        <li><strong>時長</strong>：左右拖曳滑桿。第一次建議用較短時間（例如 1～5 分鐘）熟悉流程；預設約 20 分鐘。</li>
-        <li>標題列右側會顯示估計步數（分鐘 × 該類型步頻）。</li>
+        <li><strong>類型</strong>：第一次預設為 <strong>超慢跑</strong>，也可改成散步、慢跑、馬拉松或衝刺。</li>
+        <li><strong>時長</strong>：拖曳滑桿調整。第一次建議先用 1～5 分鐘熟悉流程（預設約 20 分鐘）。</li>
+        <li>「時長」右側會顯示估計步數，方便你預覽這次大約會寫入多少步。</li>
       </ol>
 
       <figure class="shot">
@@ -360,10 +340,10 @@
     <section id="s6">
       <h2><span class="n">6.</span> 按「開始」並等待完成</h2>
       <ol class="steps">
-        <li>確認三個勾選都就緒後，按紫色的 <strong>開始</strong>。</li>
-        <li>進入「進行中」畫面，會看到目前步數與已進行／總共時間。</li>
-        <li>若「背景搖步」有開，通知列也會顯示搖步中。</li>
-        <li>時間到會自動結束；也可按 <strong>取消</strong>（會再確認一次）。取消後<strong>不會再寫入</strong>新的步數，但已經寫進 Health Connect 的會保留，歷史會標成「已取消」。</li>
+        <li>確認下方三個項目都已打勾後，按 <strong>開始</strong>。</li>
+        <li>進入「進行中」畫面，可查看目前步數與已進行／總共時間。</li>
+        <li>若已開啟「背景搖步」，通知列也會顯示搖步中。</li>
+        <li>時間到會自動結束。中途也可按 <strong>取消</strong>（會再確認一次）：之後<strong>不會再寫入</strong>新的步數，但已寫進 Health Connect 的資料會保留，歷史狀態會標成「已取消」。</li>
       </ol>
 
       <figure class="shot">
@@ -372,18 +352,18 @@
       </figure>
 
       <div class="tip">
-        <strong>建議第一次測試：</strong>設 1～3 分鐘、畫面保持開啟，看步數是否慢慢增加。
-        確認沒問題後，再試關屏／較長時間。
+        <strong>第一次建議：</strong>先設 1～3 分鐘並保持畫面開啟，確認步數會慢慢增加。
+        沒問題後，再試關屏或較長時間。
       </div>
     </section>
 
     <section id="s7">
       <h2><span class="n">7.</span> 查看歷史紀錄</h2>
       <ol class="steps">
-        <li>回主畫面後，右下角按 <strong>歷史紀錄</strong>。</li>
-        <li>每一筆會顯示開始時間、類型、時長、步數、狀態（已完成／已取消）。</li>
-        <li>點綠色底線的 <strong>詳細記錄</strong> 可展開每一小段的寫入結果。</li>
-        <li>若要清空本機歷史，按 <strong>清空歷史</strong>（不會刪除 Health Connect 裡已寫入的步數）。</li>
+        <li>回主畫面後，按右下角 <strong>歷史紀錄</strong>。</li>
+        <li>每一筆會顯示開始時間、類型、時長、步數與狀態（已完成／已取消）。</li>
+        <li>點綠色底線的 <strong>詳細記錄</strong>，可展開各小段的寫入結果。</li>
+        <li>若要清空本機歷史，按 <strong>清空歷史</strong>。這只刪 QFit 裡的紀錄，不會刪除 Health Connect 已寫入的步數。</li>
       </ol>
 
       <figure class="shot">
@@ -395,20 +375,19 @@
     <section id="s8">
       <h2><span class="n">8.</span> 常見問題</h2>
       <p><strong>Q. Health Connect 沒打勾？</strong><br />
-        再點一次 Health Connect 授權；並確認手機已安裝 Health Connect。</p>
+        再點一次 Health Connect 完成授權，並確認手機已安裝 Health Connect。</p>
       <p><strong>Q. 電池最佳化設了還是沒勾？</strong><br />
-        確認選的是「不受限制」。回到 QFit 後畫面會自動重查；仍不行可完全滑掉 App 再重開。</p>
-      <p><strong>Q. 關屏後步數好像停住？</strong><br />
-        先確認「背景搖步」與「電池最佳化」都已開啟。亮屏回來後，App 會盡量把到期段落追上牆鐘。</p>
+        確認選的是「不受限制」。回到 QFit 後會自動重新檢查；仍不行可把 App 完全滑掉後再重開。</p>
+      <p><strong>Q. 關屏後步數好像沒增加？</strong><br />
+        先確認「背景搖步」與「電池最佳化」都已開啟。重新亮屏後，App 會盡量補上關屏期間應寫入的步數。</p>
       <p><strong>Q. 其他 App 看不到步數？</strong><br />
-        到 Health Connect 確認該 App 有<strong>讀取</strong>權限，且資料來源包含 QFit 寫入的紀錄。</p>
-      <p><strong>Q. 左上選單是什麼？</strong><br />
-        「關於」：用途說明、免責聲明、版本號碼。</p>
+        到 Health Connect 確認該 App 有<strong>讀取</strong>權限，且能讀到 QFit 寫入的資料。</p>
+      <p><strong>Q. 左上角選單是什麼？</strong><br />
+        「關於」頁面：用途說明、免責聲明與版本號碼。</p>
     </section>
 
     <footer>
-      <p>QFit · 作者 Pixson Lin · 本頁為 GitHub Pages 說明書草稿，截圖請放到同目錄 <code>images/</code>。</p>
-      <p>啟用 Pages 時：Repository Settings → Pages → Deploy from branch → folder <code>/docs</code>。</p>
+      <p>QFit · 作者 Pixson Lin</p>
     </footer>
   </div>
 </body>
