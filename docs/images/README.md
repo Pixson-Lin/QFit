@@ -1,5 +1,7 @@
 # Guide screenshots
 
+Capture instructions for a local adb/scrcpy agent: [../Screenshot_Capture_Prompt.md](../Screenshot_Capture_Prompt.md)
+
 Put PNGs here for `docs/index.html` figure placeholders:
 
 | File | Content |
