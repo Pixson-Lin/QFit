@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="assets/guide.css" />
   <script>
     (function () {
-      var langs = (navigator.languages && navigator.languages.length)
-        ? navigator.languages
-        : [navigator.language || "en"];
-      var hant = langs.some(function (l) {
-        var s = String(l || "").toLowerCase();
-        return s === "zh-tw" || s === "zh-hk" || s === "zh-mo" ||
-          s.indexOf("zh-hant") === 0 || s === "zh-hant";
-      });
+      // Match App rule: follow the *primary* system/browser language only.
+      // Do not scan secondary prefs — English UI + zh-TW fallback must stay on en/.
+      var primary = (navigator.languages && navigator.languages.length)
+        ? navigator.languages[0]
+        : (navigator.language || "en");
+      var s = String(primary || "").toLowerCase().replace(/_/g, "-");
+      var hant = s === "zh-tw" || s === "zh-hk" || s === "zh-mo" ||
+        s.indexOf("zh-hant") === 0 || s === "zh-hant";
       location.replace(hant ? "zh/" : "en/");
     })();
   </script>
