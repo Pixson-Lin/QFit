@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pixsonlin.qfit.R
 import com.pixsonlin.qfit.data.HistoryRepository
-import com.pixsonlin.qfit.data.db.RunStatus
 import com.pixsonlin.qfit.data.db.RunWithSegments
 import com.pixsonlin.qfit.data.db.SegmentEntity
 import com.pixsonlin.qfit.data.db.SegmentWriteStatus
@@ -168,7 +167,7 @@ fun HistoryScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showClearConfirm = false }) {
-                    Text(stringResource(R.string.cancel_dismiss))
+                    Text(stringResource(R.string.battery_guide_cancel))
                 }
             },
         )
@@ -182,8 +181,7 @@ private fun HistoryCard(
     onToggleDetails: () -> Unit,
 ) {
     val run = item.run
-    val statusLabel = runCatching { RunStatus.valueOf(run.status).displayName }
-        .getOrDefault(run.status)
+    val statusLabel = runStatusLabel(run.status)
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -202,7 +200,7 @@ private fun HistoryCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(R.string.history_type, run.intensityDisplayName),
+                text = stringResource(R.string.history_type, intensityLabelForRun(run)),
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
@@ -259,12 +257,19 @@ private fun HistoryCard(
     }
 }
 
+@Composable
 private fun formatSegmentLine(segment: SegmentEntity): String {
-    val result = runCatching { SegmentWriteStatus.valueOf(segment.writeStatus).displayName }
-        .getOrElse { if (segment.success) "成功" else "失敗" }
-    return "#${segment.segmentIndex} ${formatTime(segment.startTimeMillis)}-" +
-        "${formatTime(segment.endTimeMillis)}, ${segment.steps}步, " +
-        String.format(Locale.US, "%.2f", segment.distanceMeters) + "公尺, $result"
+    val result = segmentStatusLabel(segment.writeStatus, segment.success)
+    val distance = String.format(Locale.getDefault(), "%.2f", segment.distanceMeters)
+    return stringResource(
+        R.string.history_segment_line,
+        segment.segmentIndex,
+        formatTime(segment.startTimeMillis),
+        formatTime(segment.endTimeMillis),
+        segment.steps,
+        distance,
+        result,
+    )
 }
 
 private fun formatDateTime(millis: Long): String =

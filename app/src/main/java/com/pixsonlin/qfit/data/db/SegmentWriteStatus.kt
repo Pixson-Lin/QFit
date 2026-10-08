@@ -1,8 +1,11 @@
 package com.pixsonlin.qfit.data.db
 
-enum class SegmentWriteStatus(val displayName: String) {
-    PLANNED("待寫入"),
-    WRITTEN("成功"),
-    FAILED("失敗"),
-    SKIPPED("略過"),
+import androidx.annotation.StringRes
+import com.pixsonlin.qfit.R
+
+enum class SegmentWriteStatus(@StringRes val labelRes: Int) {
+    PLANNED(R.string.segment_planned),
+    WRITTEN(R.string.segment_written),
+    FAILED(R.string.segment_failed),
+    SKIPPED(R.string.segment_skipped),
 }

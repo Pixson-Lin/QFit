@@ -18,9 +18,9 @@
 
 **Shipped** in `0.4.0-catchup` (Scheme C lite). After screen-off / Doze delay, SCREEN_ON or the next alarm should burst-write due planned segments so steps approach wall clock.
 
-**How to verify:** Start a run with **背景搖步** on → lock screen 2–5 minutes → unlock → In-progress steps should jump toward elapsed × cadence (not stay frozen at pre-lock value).
+**How to verify:** Start a run with **搖步提示列** on → lock screen 2–5 minutes → unlock → In-progress steps should jump toward elapsed × cadence (not stay frozen at pre-lock value).
 
-**Still weaker when:** **背景搖步** is off (no FGS notification), exact alarms revoked, or OEM kills the process aggressively — orphan resume on next app open still finalizes/catches up from Room plan.
+**Still weaker when:** **搖步提示列** is off (no FGS notification), exact alarms revoked, or OEM kills the process aggressively — orphan resume on next app open still finalizes/catches up from Room plan.
 
 ## Cannot deep-link to app Battery three-option page (all OEMs)
 

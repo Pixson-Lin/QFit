@@ -34,7 +34,8 @@ class HistoryRepository(context: Context) {
         val run = RunEntity(
             id = runId,
             intensityName = intensity.name,
-            intensityDisplayName = intensity.displayName,
+            // Store enum key; UI translates via intensityName at display time.
+            intensityDisplayName = intensity.name,
             plannedDurationMinutes = durationMinutes,
             startTimeMillis = start,
             plannedEndTimeMillis = plannedEnd,

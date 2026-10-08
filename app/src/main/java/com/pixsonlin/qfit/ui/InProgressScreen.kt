@@ -112,7 +112,7 @@ fun InProgressScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     ProgressRow(
                         headline = stringResource(R.string.label_type),
-                        supporting = run?.intensity?.displayName ?: "—",
+                        supporting = run?.intensity?.label() ?: "—",
                     )
                     ProgressRow(
                         headline = stringResource(R.string.label_current_steps),

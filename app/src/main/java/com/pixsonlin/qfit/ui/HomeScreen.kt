@@ -293,7 +293,7 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
 
-            // One row: HC · 背景搖步 · 電池（計時已併入電池豁免，不再單獨顯示）
+            // One row: HC · 搖步提示列 · 電池
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top,

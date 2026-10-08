@@ -6,7 +6,7 @@ Put PNGs here for `docs/index.html` figure placeholders:
 |---|---|
 | `01-home.png` | Home screen |
 | `02-health-connect.png` | Health Connect permission |
-| `03-background-run.png` | 背景搖步 checked (+ optional notif permission) |
+| `03-background-run.png` | 搖步提示列 / Run notification (+ optional notif permission) |
 | `04a-battery-dialog.png` | Battery guide dialog |
 | `04b-app-info.png` | App info → Battery |
 | `04c-unrestricted.png` | Unrestricted / Optimized / Restricted |
