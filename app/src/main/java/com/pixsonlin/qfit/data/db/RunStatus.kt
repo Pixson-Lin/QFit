@@ -1,7 +1,10 @@
 package com.pixsonlin.qfit.data.db
 
-enum class RunStatus(val displayName: String) {
-    RUNNING("進行中"),
-    COMPLETED("已完成"),
-    CANCELLED("已取消"),
+import androidx.annotation.StringRes
+import com.pixsonlin.qfit.R
+
+enum class RunStatus(@StringRes val labelRes: Int) {
+    RUNNING(R.string.status_running),
+    COMPLETED(R.string.status_completed),
+    CANCELLED(R.string.status_cancelled),
 }

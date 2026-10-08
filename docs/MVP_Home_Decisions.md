@@ -19,8 +19,9 @@
 | Intensity | 5 presets; SPM: 散步 80, 超慢跑 140, 慢跑 165, 馬拉松 180, 衝刺 210. **First-launch default: 超慢跑** |
 | Duration | Non-uniform **value** stops **1, 3, 5, 10…60 (+5), 70…120 (+10), 140…240 (+20)** (26). Slider ticks are **equal-spaced by stop index**. Estimate label shares the「時長」title row (end-aligned, 14sp). Default **20 min**. |
 | Estimate | `durationMinutes × SPM` (actual run adds segment noise) |
-| Env checkboxes | One row: **Health Connect · 背景搖步 · 電池最佳化**. Battery dialog explains「點電池 → 不受限制」, then opens app info. **計時 removed from UI** — battery allowlist usually implies `canScheduleExactAlarms()`; scheduler still uses exact/inexact + SCREEN_ON + WakeLock fallbacks. |
-| **背景搖步** | Preference (default **on**). On = foreground service + ongoing notification (harder for OS to kill). Off = plain service, **no notification bar**, higher chance of being killed in background. Persisted in `RunConfigStore`. Turning on may request POST_NOTIFICATIONS on API 33+. |
+| Env checkboxes | One row: **Health Connect · 搖步提示列 · 電池最佳化** (en: Run notification / Battery Optimization). Battery dialog explains「點電池 → 不受限制」, then opens app info. |
+| **搖步提示列** | Preference (default **on**). On = foreground service + ongoing notification. Off = plain service, no notification. Persisted in `RunConfigStore`. May request POST_NOTIFICATIONS on API 33+. |
+| i18n | `en` (default) + `zh-Hant`. System locale; non–Traditional Chinese → English. Room stores enum keys; UI translates. See [I18n_Glossary.md](I18n_Glossary.md). |
 | Health Connect | Auto-request on launch if missing; checkbox = readiness + manual jump |
 | Menu | About |
 | History button | Opens History screen |

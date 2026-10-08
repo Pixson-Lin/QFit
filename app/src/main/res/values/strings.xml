@@ -1,61 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">QFit</string>
-    <string name="app_bar_title">QFit 電子搖步機</string>
-    <string name="cd_menu">關於選單</string>
-    <string name="cd_back">返回</string>
+    <string name="app_bar_title">QFit Step Simulator</string>
+    <string name="cd_menu">About menu</string>
+    <string name="cd_back">Back</string>
 
-    <string name="label_type">類型</string>
-    <string name="label_choose_type">選擇類型</string>
-    <string name="label_duration">時長</string>
-    <string name="estimate_steps">%1$d 分 · 估計約 %2$s 步</string>
-    <string name="action_start">開始</string>
-    <string name="action_history">歷史紀錄</string>
-    <string name="err_pick_type">請先選擇類型</string>
-    <string name="err_hc_required">需要 Health Connect 寫入權限才能開始</string>
+    <string name="label_type">Type</string>
+    <string name="label_choose_type">Choose type</string>
+    <string name="label_duration">Duration</string>
+    <string name="estimate_steps">%1$d min · ~%2$s steps</string>
+    <string name="action_start">Start</string>
+    <string name="action_history">History</string>
+    <string name="err_pick_type">Please choose a type first</string>
+    <string name="err_hc_required">Health Connect write access is required to start</string>
 
     <string name="check_hc">Health Connect</string>
-    <string name="check_background_run">背景搖步</string>
-    <string name="check_battery">電池最佳化</string>
-    <string name="battery_guide_title">設定電池用量</string>
-    <string name="battery_guide_body">接下來會開啟 QFit 的應用程式資訊頁。\n\n1. 點選「電池」\n2. 選擇「不受限制」</string>
-    <string name="battery_guide_go">前往設定</string>
-    <string name="battery_guide_cancel">取消</string>
+    <string name="check_background_run">Run notification</string>
+    <string name="check_battery">Battery Optimization</string>
+    <string name="battery_guide_title">Set battery usage</string>
+    <string name="battery_guide_body">Next, QFit’s App info page will open.\n\n1. Tap Battery\n2. Choose Unrestricted</string>
+    <string name="battery_guide_go">Open settings</string>
+    <string name="battery_guide_cancel">Cancel</string>
 
-    <string name="in_progress_title">進行中</string>
-    <string name="label_current_steps">目前步數</string>
-    <string name="label_elapsed_total">已進行/總共</string>
-    <string name="action_cancel">取消</string>
-    <string name="cancel_title">取消這次搖步？</string>
-    <string name="cancel_body">之後不會再寫入 Health Connect。已經寫進去的步數會保留，並記成「已取消」。</string>
-    <string name="cancel_confirm">確定取消</string>
-    <string name="cancel_dismiss">繼續搖步</string>
+    <string name="intensity_stroll">Walk</string>
+    <string name="intensity_super_slow_jog">Slow Jogging</string>
+    <string name="intensity_jog">Jog</string>
+    <string name="intensity_marathon">Marathon</string>
+    <string name="intensity_sprint">Sprint</string>
+    <string name="intensity_menu_format">%1$s (%2$d spm)</string>
 
-    <string name="history_empty">還沒有搖步紀錄。</string>
-    <string name="history_start_time">搖步開始時間 : %1$s</string>
-    <string name="history_type">類型 : %1$s</string>
-    <string name="history_duration">時長 : 設定%1$s ，實際 %2$s</string>
-    <string name="history_steps">步數 : %1$d</string>
-    <string name="history_status">狀態 : %1$s</string>
-    <string name="history_details">詳細記錄</string>
-    <string name="history_no_segments">沒有段落資料。</string>
-    <string name="action_back_home">回主畫面</string>
-    <string name="action_clear_history">清空歷史</string>
-    <string name="clear_history_title">清空全部歷史？</string>
-    <string name="clear_history_body">這會刪除本機所有搖步紀錄，無法復原。Health Connect 裡已寫入的步數不會被刪除。</string>
-    <string name="clear_history_confirm">確定清空</string>
+    <string name="status_running">In progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
 
-    <string name="about_title">關於</string>
-    <string name="about_purpose">QFit 是電子搖步機：在這支手機上依你設定的類型與時長，把步數、距離與運動寫入 Health Connect，供其他健康／遊戲 App 讀取。不需要登入 Google 帳號，也不會把帳號交給開發者。</string>
-    <string name="about_disclaimer">免責聲明：本 App 寫入的是模擬步數資料，僅供個人測試與娛樂用途。請遵守下游 App／遊戲的使用條款。開發者不以任何方式保證第三方 App 的行為、獎勵或帳號安全。使用本 App 的風險由使用者自行承擔。</string>
-    <string name="about_author">作者：Pixson Lin</string>
-    <string name="about_version_name">versionName：%1$s</string>
-    <string name="about_version_code">versionCode：%1$d</string>
+    <string name="segment_planned">Planned</string>
+    <string name="segment_written">Written</string>
+    <string name="segment_failed">Failed</string>
+    <string name="segment_skipped">Skipped</string>
 
-    <string name="rationale_title">為什麼需要 Health Connect</string>
-    <string name="rationale_body">QFit 會在這支手機寫入步數、距離與運動資料，讓其他健康 App 可以讀取。不會登入或傳送你的 Google 帳號給開發者。</string>
+    <string name="in_progress_title">In progress</string>
+    <string name="label_current_steps">Steps so far</string>
+    <string name="label_elapsed_total">Elapsed / total</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="cancel_title">Cancel this run?</string>
+    <string name="cancel_body">No more data will be written to Health Connect. Steps already written stay, and the run is marked Cancelled.</string>
+    <string name="cancel_confirm">Cancel run</string>
+    <string name="cancel_dismiss">Keep running</string>
 
-    <string name="notif_channel_name">搖步進行中</string>
-    <string name="notif_running">QFit 搖步中</string>
-    <string name="notif_body">已寫入 %1$d 步 · 計畫 %2$d 分</string>
+    <string name="history_empty">No runs yet.</string>
+    <string name="history_start_time">Started: %1$s</string>
+    <string name="history_type">Type: %1$s</string>
+    <string name="history_duration">Duration: planned %1$s, actual %2$s</string>
+    <string name="history_steps">Steps: %1$d</string>
+    <string name="history_status">Status: %1$s</string>
+    <string name="history_details">Details</string>
+    <string name="history_no_segments">No segment data.</string>
+    <string name="history_segment_line">#%1$d %2$s-%3$s, %4$d steps, %5$s m, %6$s</string>
+    <string name="action_back_home">Home</string>
+    <string name="action_clear_history">Clear history</string>
+    <string name="clear_history_title">Clear all history?</string>
+    <string name="clear_history_body">This deletes all local run records and cannot be undone. Steps already in Health Connect are not removed.</string>
+    <string name="clear_history_confirm">Clear</string>
+
+    <string name="about_title">About</string>
+    <string name="about_purpose">QFit is a step simulator: on this phone, it writes steps, distance, and exercise to Health Connect for other health or game apps to read. No Google sign-in. Your account is never given to the developer.</string>
+    <string name="about_disclaimer">Disclaimer: QFit writes simulated step data for personal testing and entertainment only. Follow the terms of any downstream app or game. The developer does not guarantee third-party rewards, behavior, or account safety. Use at your own risk.</string>
+    <string name="about_author">Author: Pixson Lin</string>
+    <string name="about_version_name">versionName: %1$s</string>
+    <string name="about_version_code">versionCode: %1$d</string>
+    <string name="about_tagline">No sign-in. On-device permissions only. Nothing uploaded to the developer.</string>
+
+    <string name="rationale_title">Why Health Connect is needed</string>
+    <string name="rationale_body">QFit writes steps, distance, and exercise on this phone so other health apps can read them. It does not sign in or send your Google account to the developer.</string>
+
+    <string name="notif_channel_name">Run in progress</string>
+    <string name="notif_running">QFit running</string>
+    <string name="notif_body">%1$d steps written · %2$d min planned</string>
 </resources>
