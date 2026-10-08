@@ -21,11 +21,9 @@ Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versionin
 
 ### User guide (GitHub Pages)
 
-- Entry (auto zh-Hant → `zh/`, else `en/`): [docs/index.html](docs/index.html)
-- English: [docs/en/](docs/en/) · 繁中: [docs/zh/](docs/zh/)
-- Glossary (shared with App): [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
-
-啟用 Pages：Settings → Pages → Deploy from branch → folder `/docs`。
+- Live: https://pixson-lin.github.io/QFit/
+- Source: [docs/index.html](docs/index.html) (auto zh-Hant → `zh/`, else `en/`) · [en](docs/en/) · [zh](docs/zh/)
+- Glossary: [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
 
 ### Sideload
 
