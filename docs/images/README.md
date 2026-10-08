@@ -1,6 +1,8 @@
 # Guide screenshots
 
-Put PNGs here for `docs/index.html` figure placeholders:
+Shared PNGs for `docs/en/index.html` and `docs/zh/index.html` (`../images/…`).
+
+English UI captures can replace the same filenames when ready (user-owned). Until then, zh screenshots are fine for both pages; the English guide notes that mismatch.
 
 | File | Content |
 |---|---|
@@ -13,9 +15,3 @@ Put PNGs here for `docs/index.html` figure placeholders:
 | `05-type-duration.png` | Type + duration |
 | `06-in-progress.png` | In-progress |
 | `07-history.png` | History list |
-
-After adding a file, in `docs/index.html` replace that step’s `.shot-placeholder` with:
-
-```html
-<img src="images/01-home.png" alt="…" />
-```

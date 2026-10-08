@@ -11,7 +11,7 @@
 2. **Selection rule:** follow system language; **any non–Traditional-Chinese locale uses English** (including `zh-CN`).
 3. **Persistence:** Room stores **enum keys** (`intensityName` / status names); UI translates at display time. New runs also store the key in `intensityDisplayName` (legacy rows may still hold old Chinese labels — UI prefers `intensityName`).
 4. **No in-app language picker** in v1.
-5. **Scope v1:** App UI (+ Chinese guide copy for「搖步提示列」). Full English guide HTML later.
+5. **Scope:** App UI + user guide HTML (`docs/en/`, `docs/zh/`; root `docs/index.html` redirects by browser language).
 
 ## Proper nouns (do not translate)
 

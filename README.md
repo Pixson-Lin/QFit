@@ -19,9 +19,11 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md)
 
-### User guide (GitHub Pages draft)
+### User guide (GitHub Pages)
 
-初次執行說明（HTML，待補截圖）：[docs/index.html](docs/index.html)
+- Entry (auto zh-Hant → `zh/`, else `en/`): [docs/index.html](docs/index.html)
+- English: [docs/en/](docs/en/) · 繁中: [docs/zh/](docs/zh/)
+- Glossary (shared with App): [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
 
 啟用 Pages：Settings → Pages → Deploy from branch → folder `/docs`。
 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QFit 使用說明 · 初次執行</title>
+  <meta name="description" content="QFit 電子搖步機：從安裝到第一次完成搖步的操作說明。免登入，只要本機權限。" />
+  <link rel="stylesheet" href="../assets/guide.css" />
+</head>
+<body>
+  <div class="wrap">
+    <nav class="lang-switch" aria-label="Language">
+      <a href="../en/">English</a>
+      <a href="./" aria-current="page">繁體中文</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">QFit 使用說明</div>
+      <h1>初次執行操作教學</h1>
+      <p class="tagline">免登入，只要本機權限，資料不上傳給開發者</p>
+      <p class="lede">
+        依第一次開啟 App 的順序，從安裝、完成必要設定，到跑完第一次搖步。
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="目錄">
+      <h2>目錄</h2>
+      <ol>
+        <li><a href="#s0">開始之前</a></li>
+        <li><a href="#s1">安裝並開啟 QFit</a></li>
+        <li><a href="#s2">允許 Health Connect 寫入</a></li>
+        <li><a href="#s3">確認「搖步提示列」</a></li>
+        <li><a href="#s4">設定「電池最佳化」為不受限制</a></li>
+        <li><a href="#s5">選擇類型與時長</a></li>
+        <li><a href="#s6">按「開始」並等待完成</a></li>
+        <li><a href="#s7">查看歷史紀錄</a></li>
+        <li><a href="#s8">常見問題</a></li>
+      </ol>
+    </nav>
+
+    <section id="s0">
+      <h2><span class="n">0.</span> 開始之前</h2>
+      <ul class="check">
+        <li>Android 手機（建議 Android 12 以上）</li>
+        <li>已安裝 <strong>Health Connect</strong>（多數新機已內建；沒有可到 Play 商店安裝）</li>
+        <li>QFit 的安裝檔（APK）</li>
+      </ul>
+      <div class="warn">
+        <strong>請先了解：</strong>QFit 寫入的是<strong>模擬步數</strong>，僅供個人測試與娛樂。
+        請遵守你使用的健康／遊戲 App 之條款；使用風險由使用者自行承擔。
+      </div>
+    </section>
+
+    <section id="s1">
+      <h2><span class="n">1.</span> 安裝並開啟 QFit</h2>
+      <ol class="steps">
+        <li>把 APK 傳到手機後點選安裝。</li>
+        <li>若系統提示「不允許未知來源」，到設定允許該來源後再安裝。</li>
+        <li>安裝完成後開啟 <strong>QFit</strong>。主畫面可設定類型與時長，下方有三個環境勾選，右下角可進入歷史紀錄。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/01-home.png" alt="QFit 主畫面" />
+        <figcaption>圖 1 · 主畫面總覽</figcaption>
+      </figure>
+    </section>
+
+    <section id="s2">
+      <h2><span class="n">2.</span> 允許 Health Connect 寫入</h2>
+      <p>
+        第一次開啟時，系統通常會<strong>自動跳出</strong> Health Connect 權限畫面。
+        請允許 QFit 寫入<strong>步數、距離、運動</strong>等資料。
+      </p>
+      <ol class="steps">
+        <li>在權限畫面允許所需項目（可使用「全部允許」）後按「允許」。</li>
+        <li>回到主畫面，確認 <strong>Health Connect</strong> 已打勾。</li>
+        <li>若沒有自動跳出，或之後取消了權限：點主畫面的 <strong>Health Connect</strong>，再完成一次授權。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/02-health-connect.png" alt="Health Connect 授權畫面" />
+        <figcaption>圖 2 · Health Connect 權限</figcaption>
+      </figure>
+      <div class="tip">
+        <strong>小提醒：</strong>QFit <strong>不需要</strong>登入 Google 帳號，也不會把帳號交給開發者。
+        資料寫在這支手機的 Health Connect 裡，供其他 App 讀取。
+      </div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="n">3.</span> 確認「搖步提示列」</h2>
+      <p>
+        主畫面上的 <strong>搖步提示列</strong> 預設為<strong>開啟</strong>，建議維持開啟。
+        開啟時會在通知列顯示「搖步中」，比較不容易被系統清掉後台。
+      </p>
+      <ol class="steps">
+        <li>確認 <strong>搖步提示列</strong> 已打勾。</li>
+        <li>若系統詢問是否允許通知，請選「允許」（Android 13 以上較常見）。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/03-background-run.png" alt="允許 QFit 傳送通知" />
+        <figcaption>圖 3 · 允許通知（搖步提示列）</figcaption>
+      </figure>
+      <div class="note">
+        若關閉「搖步提示列」，就<strong>不會</strong>出現通知列，關屏後也較容易被系統結束，
+        寫入步數可能較不穩定。一般使用請保持開啟。
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="n">4.</span> 設定「電池最佳化」為不受限制</h2>
+      <p>
+        這一步很重要。設成「不受限制」後，關屏時 QFit 比較能持續把步數寫進 Health Connect。
+      </p>
+      <ol class="steps">
+        <li>點主畫面的 <strong>電池最佳化</strong>。</li>
+        <li>會先出現說明視窗，說明接下來要做的兩步：點「電池」→ 選「不受限制」。</li>
+        <li>按 <strong>前往設定</strong>。</li>
+        <li>在 QFit 的應用程式資訊頁，點 <strong>電池</strong>。</li>
+        <li>選擇 <strong>不受限制</strong>（部分手機顯示為「不限制」或 Unrestricted）。</li>
+        <li>返回 QFit，確認 <strong>電池最佳化</strong> 已打勾。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/04a-battery-dialog.png" alt="電池設定說明對話框" />
+        <figcaption>圖 4a · 電池設定說明</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="../images/04b-app-info.png" alt="QFit 應用程式資訊頁" />
+        <figcaption>圖 4b · 應用程式資訊頁</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="../images/04c-unrestricted.png" alt="電池用量選擇不受限制" />
+        <figcaption>圖 4c · 選「不受限制」</figcaption>
+      </figure>
+      <div class="warn">
+        不同品牌的選單名稱可能略有差異，目標都是把 QFit 的電池用量設成
+        <strong>不受限制</strong>。若勾選沒立刻更新，回到主畫面再看一次即可。
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="n">5.</span> 選擇類型與時長</h2>
+      <ol class="steps">
+        <li><strong>類型</strong>：第一次預設為 <strong>超慢跑</strong>，也可改成散步、慢跑、馬拉松或衝刺。</li>
+        <li><strong>時長</strong>：拖曳滑桿調整。第一次建議先用 1～5 分鐘熟悉流程（預設約 20 分鐘）。</li>
+        <li>「時長」右側會顯示估計步數，方便你預覽這次大約會寫入多少步。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/05-type-duration.png" alt="類型與時長設定" />
+        <figcaption>圖 5 · 類型與時長</figcaption>
+      </figure>
+    </section>
+
+    <section id="s6">
+      <h2><span class="n">6.</span> 按「開始」並等待完成</h2>
+      <ol class="steps">
+        <li>確認下方三個項目都已打勾後，按 <strong>開始</strong>。</li>
+        <li>進入「進行中」畫面，可查看目前步數與已進行／總共時間。</li>
+        <li>若已開啟「搖步提示列」，通知列也會顯示搖步中。</li>
+        <li>時間到會自動結束。中途也可按 <strong>取消</strong>（會再確認一次）：之後<strong>不會再寫入</strong>新的步數，但已寫進 Health Connect 的資料會保留，歷史狀態會標成「已取消」。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/06-in-progress.png" alt="搖步進行中畫面" />
+        <figcaption>圖 6 · 進行中</figcaption>
+      </figure>
+      <div class="tip">
+        <strong>第一次建議：</strong>先設 1～3 分鐘並保持畫面開啟，確認步數會慢慢增加。
+        沒問題後，再試關屏或較長時間。
+      </div>
+    </section>
+
+    <section id="s7">
+      <h2><span class="n">7.</span> 查看歷史紀錄</h2>
+      <ol class="steps">
+        <li>回主畫面後，按右下角 <strong>歷史紀錄</strong>。</li>
+        <li>每一筆會顯示開始時間、類型、時長、步數與狀態（已完成／已取消）。</li>
+        <li>點綠色底線的 <strong>詳細記錄</strong>，可展開各小段的寫入結果。</li>
+        <li>若要清空本機歷史，按 <strong>清空歷史</strong>。這只刪 QFit 裡的紀錄，不會刪除 Health Connect 已寫入的步數。</li>
+      </ol>
+      <figure class="shot">
+        <img src="../images/07-history.png" alt="歷史紀錄列表" />
+        <figcaption>圖 7 · 歷史紀錄</figcaption>
+      </figure>
+    </section>
+
+    <section id="s8">
+      <h2><span class="n">8.</span> 常見問題</h2>
+      <p><strong>Q. Health Connect 沒打勾？</strong><br />
+        再點一次 Health Connect 完成授權，並確認手機已安裝 Health Connect。</p>
+      <p><strong>Q. 電池最佳化設了還是沒勾？</strong><br />
+        確認選的是「不受限制」。回到 QFit 後會自動重新檢查；仍不行可把 App 完全滑掉後再重開。</p>
+      <p><strong>Q. 關屏後步數好像沒增加？</strong><br />
+        先確認「搖步提示列」與「電池最佳化」都已開啟。重新亮屏後，App 會盡量補上關屏期間應寫入的步數。</p>
+      <p><strong>Q. 其他 App 看不到步數？</strong><br />
+        到 Health Connect 確認該 App 有<strong>讀取</strong>權限，且能讀到 QFit 寫入的資料。</p>
+      <p><strong>Q. 左上角選單是什麼？</strong><br />
+        「關於」頁面：用途說明、免責聲明與版本號碼。</p>
+    </section>
+
+    <footer>
+      <p>QFit · 作者 Pixson Lin</p>
+    </footer>
+  </div>
+</body>
+</html>
