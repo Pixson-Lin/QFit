@@ -21,9 +21,9 @@ Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versionin
 
 ### User guide (GitHub Pages)
 
-- Live: https://pixson-lin.github.io/QFit/
 - Source: [docs/index.html](docs/index.html) (auto zh-Hant → `zh/`, else `en/`) · [en](docs/en/) · [zh](docs/zh/)
 - Glossary: [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
+- After Pages is on (`Settings → Pages → Deploy from branch → main → /docs`): https://pixson-lin.github.io/QFit/
 
 ### Sideload
 
