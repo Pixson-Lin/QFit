@@ -25,7 +25,7 @@ Do these in Play Console for the **QFit** app (not APBFit leftovers):
 Optional later (not blocking the form text itself, but needed before closed testing goes live):
 
 6. Complete any remaining **App content** questionnaires still marked incomplete (Ads, Target audience, News, etc.) — for QFit: usually **No ads**, not a news app, not primarily for children.
-7. Upload a **signed AAB** (項目 7) before testers can install from Play.
+7. Upload a **signed AAB** (項目 7) before testers can install from Play — see [Release_Signing.md](Release_Signing.md).
 
 ---
 
