@@ -103,6 +103,41 @@ English:
 
 ---
 
+## Foreground service — `FOREGROUND_SERVICE_DATA_SYNC` (often required on first AAB upload)
+
+QFit’s run engine is a foreground service (`foregroundServiceType="dataSync"`) that keeps writing simulated segments into **on-device Health Connect** while a run is active, with an ongoing **Run notification**.
+
+### Suggested checkbox
+
+- **本機處理 (Local processing) → 其他 (Other)** — correct for QFit  
+  (Not network backup/restore; not media transcoding; not import/export.)
+
+Do **not** check network processing unless you later add real cloud sync (QFit does not).
+
+### Video (required when “其他” is selected)
+
+Upload a short screen recording (unlisted YouTube or a Drive link set to **anyone with the link can view**). Suggested 30–90s script:
+
+1. Open QFit → show Home with **Run notification** checked.  
+2. Set a short duration (e.g. 1–3 min) → tap **Start**.  
+3. Show **In progress** (steps increasing) **and** the ongoing status-bar / notification (“搖步中” / run notification).  
+4. Optional: lock screen 10–20s → unlock → show steps continuing / catch-up.  
+5. End or cancel the run.
+
+Paste the public video URL into **影片連結**.
+
+### Short purpose text (if a free-text field appears)
+
+English:
+
+> During an active user-started run, QFit uses a dataSync foreground service with an ongoing notification to write planned step/distance/exercise segments into Health Connect on the device, including while the app is in the background.
+
+繁中：
+
+> 使用者開始搖步後，QFit 以 dataSync 前景服務搭配持續通知，在背景把排程的步數／距離／運動分段寫入本機 Health Connect。
+
+---
+
 ## After you finish 項目 6
 
 Reply with any Console warning/error screenshots or exact question text that does not match this doc, and we adjust answers.  
