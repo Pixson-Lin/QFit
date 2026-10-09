@@ -116,16 +116,11 @@ Do **not** check network processing unless you later add real cloud sync (QFit d
 
 ### Video (required when “其他” is selected)
 
-Upload a short screen recording (unlisted YouTube or a Drive link set to **anyone with the link can view**). Suggested 30–90s script:
+Upload a short screen recording (unlisted YouTube or a Drive link set to **anyone with the link can view**).
 
-1. Open QFit → show Home with **Run notification** checked.  
-2. Set a short duration (e.g. 1–3 min) → tap **Start**.  
-3. Show **In progress** (steps increasing) **and** the ongoing status-bar / notification (“搖步中” / run notification).  
-4. Optional: lock screen 10–20s → unlock → show steps continuing / catch-up.  
-5. End or cancel the run.
+**Local agent prompt (shot list + adb/scrcpy):** [FGS_Declaration_Video_Prompt.md](FGS_Declaration_Video_Prompt.md)
 
 Paste the public video URL into **影片連結**.
-
 ### Short purpose text (if a free-text field appears)
 
 English:
