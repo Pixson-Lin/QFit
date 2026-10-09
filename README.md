@@ -17,7 +17,7 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 - About（最下方顯示 `versionName` + `versionCode`）
 - **Scheme C lite**: pre-plan segments, **batchSize=2**, AlarmManager next-deadline + SCREEN_ON catch-up, orphan resume
 
-Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md)
+Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md) · Play declarations: [docs/Play_Console_Declarations.md](docs/Play_Console_Declarations.md)
 
 ### User guide & privacy (GitHub Pages)
 
