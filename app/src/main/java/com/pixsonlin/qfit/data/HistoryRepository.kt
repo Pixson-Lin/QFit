@@ -11,6 +11,7 @@ import com.pixsonlin.qfit.domain.SegmentData
 import com.pixsonlin.qfit.domain.SegmentPlanner
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
+import kotlin.math.max
 
 class HistoryRepository(context: Context) {
     private val dao = QFitDatabase.get(context).historyDao()
@@ -64,6 +65,15 @@ class HistoryRepository(context: Context) {
             )
         }
         return run
+    }
+
+    /**
+     * Wall-clock end the session must cover: last planned segment end, at least [RunEntity.plannedEndTimeMillis].
+     * With last-segment overrun, this can be up to ~+34s past the configured duration.
+     */
+    suspend fun coverageEndMillis(run: RunEntity): Long {
+        val lastSegEnd = dao.maxSegmentEndTimeMillis(run.id) ?: return run.plannedEndTimeMillis
+        return max(run.plannedEndTimeMillis, lastSegEnd)
     }
 
     suspend fun getDuePlannedSegments(runId: String, now: Long, limit: Int): List<SegmentEntity> =

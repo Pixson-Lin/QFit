@@ -57,6 +57,9 @@ interface HistoryDao {
     )
     suspend fun sumWrittenSteps(runId: String): Int
 
+    @Query("SELECT MAX(endTimeMillis) FROM segments WHERE runId = :runId")
+    suspend fun maxSegmentEndTimeMillis(runId: String): Long?
+
     @Query(
         "UPDATE segments SET writeStatus = 'SKIPPED', success = 0 " +
             "WHERE runId = :runId AND writeStatus = 'PLANNED'",

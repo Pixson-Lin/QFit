@@ -27,8 +27,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026100901
-        versionName = "0.5.1-play"
+        versionCode = 2026100902
+        versionName = "0.5.2-coverage"
     }
 
     signingConfigs {
@@ -96,5 +96,6 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    testImplementation(libs.junit)
     debugImplementation(libs.androidx.ui.tooling)
 }

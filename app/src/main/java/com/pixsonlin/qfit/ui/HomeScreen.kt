@@ -246,6 +246,15 @@ fun HomeScreen(
                         fontSize = 14.sp,
                     )
                 }
+                Text(
+                    text = stringResource(R.string.estimate_expected_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp),
+                )
                 DurationMinutesSlider(
                     valueMinutes = durationMinutes,
                     onValueMinutesChange = {

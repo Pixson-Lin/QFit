@@ -9,6 +9,7 @@
     <string name="label_choose_type">選擇類型</string>
     <string name="label_duration">時長</string>
     <string name="estimate_steps">%1$d 分 · 估計約 %2$s 步</string>
+    <string name="estimate_expected_note">預計時長以排程為準（至多 +34 秒）</string>
     <string name="action_start">開始</string>
     <string name="action_history">歷史紀錄</string>
     <string name="err_pick_type">請先選擇類型</string>

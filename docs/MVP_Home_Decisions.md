@@ -18,7 +18,7 @@
 |---|---|
 | Intensity | 5 presets; SPM: 散步 80, 超慢跑 140, 慢跑 165, 馬拉松 180, 衝刺 210. **First-launch default: 超慢跑** |
 | Duration | Non-uniform **value** stops **1, 3, 5, 10…60 (+5), 70…120 (+10), 140…240 (+20)** (26). Slider ticks are **equal-spaced by stop index**. Estimate label shares the「時長」title row (end-aligned, 14sp). Default **20 min**. |
-| Estimate | `durationMinutes × SPM` (actual run adds segment noise) |
+| Estimate | `durationMinutes × SPM` (actual run adds segment noise). Note: expected wall-clock follows the segment plan (may overrun configured end by up to +34s). |
 | Env checkboxes | One row: **Health Connect · 搖步提示列 · 電池最佳化** (en: Run notification / Battery Optimization). Battery dialog explains「點電池 → 不受限制」, then opens app info. |
 | **搖步提示列** | Preference (default **on**). On = foreground service + ongoing notification. Off = plain service, no notification. Persisted in `RunConfigStore`. May request POST_NOTIFICATIONS on API 33+. |
 | i18n | `en` (default) + `zh-Hant`. System locale; non–Traditional Chinese → English. Room stores enum keys; UI translates. See [I18n_Glossary.md](I18n_Glossary.md). |
@@ -53,12 +53,15 @@
 
 Ported from APBFit v1.2 ideas (single-account only):
 
-1. **Pre-plan** all segments into Room as `PLANNED` at start (each segment ~25–35s).
+1. **Pre-plan** all segments into Room as `PLANNED` at start.
+   - Default segment length ~25–35s; runs **≤5 min** use shorter ~10–15s segments (faster first steps).
+   - Last segment may end up to **+34s** past configured `sessionEnd` so coverage does not systematically undershoot.
 2. **Write when due:** `endTime <= now`, in batches of **`batchSize = 2`** (fixed; no user UI).
-3. **Wake strategy (not fixed-interval polling):**
-   - Next AlarmManager deadline = **max `endTime` of the next up-to-`batchSize` PLANNED segments** (capped by planned session end).
+3. **Coverage end** = `max(plannedEnd, lastSegmentEnd)`. In-progress total timer and the service loop/finalize use coverage end (not only configured duration).
+4. **Wake strategy (not fixed-interval polling):**
+   - Next AlarmManager deadline = **max `endTime` of the next up-to-`batchSize` PLANNED segments** (capped by coverage end).
    - While the process is alive, the service also `awaitUntil(deadline)` in ≤5s chunks.
    - Extra catch-up triggers: `SCREEN_ON`, and orphan resume on cold start.
-4. **Catch-up throttle** when behind wall clock: 3 batches/round, 1s gap, ≤20 segments/round.
-5. **Write WakeLock** around HC inserts.
-6. Exact alarms: prefer `setExactAndAllowWhileIdle` when `canScheduleExactAlarms()` (usually true after battery「不受限制」). Fallback: `setAndAllowWhileIdle` + session WakeLock + `SCREEN_ON` catch-up.
+5. **Catch-up throttle** when behind wall clock: 3 batches/round, 1s gap, ≤20 segments/round.
+6. **Write WakeLock** around HC inserts.
+7. Exact alarms: prefer `setExactAndAllowWhileIdle` when `canScheduleExactAlarms()` (usually true after battery「不受限制」). Fallback: `setAndAllowWhileIdle` + session WakeLock + `SCREEN_ON` catch-up.

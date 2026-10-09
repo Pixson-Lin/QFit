@@ -13,3 +13,7 @@
 | `07-history.png` / `07-history_en.png` | zh / en | History list |
 
 Referenced from `docs/zh/index.html` (no suffix) and `docs/en/index.html` (`_en` suffix).
+
+## TODO — recapture after coverage UX
+
+Because In-progress now shows **planned coverage duration** (last-segment end, may be up to ~+34s past the slider duration) and Home shows the expected-length note, **re-capture** `06-in-progress.png` / `06-in-progress_en.png` (and optionally `01-home` / `05-type-duration` if the estimate note is visible) before the next guide publish.

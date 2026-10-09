@@ -9,6 +9,7 @@
     <string name="label_choose_type">Choose type</string>
     <string name="label_duration">Duration</string>
     <string name="estimate_steps">%1$d min · ~%2$s steps</string>
+    <string name="estimate_expected_note">Expected length follows the plan (up to +34s)</string>
     <string name="action_start">Start</string>
     <string name="action_history">History</string>
     <string name="err_pick_type">Please choose a type first</string>

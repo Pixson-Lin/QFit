@@ -127,6 +127,8 @@ class RunForegroundService : LifecycleService() {
         activeRun = run
         val intensity = runCatching { IntensityLevel.valueOf(run.intensityName) }.getOrNull()
             ?: return
+        // B: UI total = planned coverage end (last segment), not only configured duration.
+        val coverageEnd = repo.coverageEndMillis(run)
 
         RunSessionState.setActive(
             ActiveRunUi(
@@ -134,7 +136,7 @@ class RunForegroundService : LifecycleService() {
                 intensity = intensity,
                 durationMinutes = run.plannedDurationMinutes,
                 startTimeMillis = run.startTimeMillis,
-                endTimeMillis = run.plannedEndTimeMillis,
+                endTimeMillis = coverageEnd,
                 stepsWritten = repo.sumWrittenSteps(run.id),
             ),
         )
@@ -183,10 +185,11 @@ class RunForegroundService : LifecycleService() {
 
     private suspend fun sessionLoop() {
         val run = activeRun ?: return
-        if (System.currentTimeMillis() >= run.plannedEndTimeMillis || stopRequested) {
+        val coverageEnd = repo.coverageEndMillis(run)
+        if (System.currentTimeMillis() >= coverageEnd || stopRequested) {
             return
         }
-        while (!stopRequested && System.currentTimeMillis() < run.plannedEndTimeMillis) {
+        while (!stopRequested && System.currentTimeMillis() < coverageEnd) {
             tickMutex.withLock {
                 catchUpDue()
             }
@@ -195,8 +198,8 @@ class RunForegroundService : LifecycleService() {
 
             val now = System.currentTimeMillis()
             val next = repo.computeNextBatchDeadlineMillis(run.id, run.batchSize, now)
-                ?: run.plannedEndTimeMillis
-            val deadline = min(next, run.plannedEndTimeMillis)
+                ?: coverageEnd
+            val deadline = min(next, coverageEnd)
             if (deadline > now) {
                 scheduler?.scheduleNext(deadline)
                 awaitUntil(deadline)
@@ -207,7 +210,8 @@ class RunForegroundService : LifecycleService() {
     private suspend fun catchUpDue() {
         val run = activeRun ?: return
         if (finalized) return
-        val writeDeadline = min(System.currentTimeMillis(), run.plannedEndTimeMillis)
+        val coverageEnd = repo.coverageEndMillis(run)
+        val writeDeadline = min(System.currentTimeMillis(), coverageEnd)
 
         while (!stopRequested) {
             val roundStart = System.currentTimeMillis()
@@ -288,22 +292,24 @@ class RunForegroundService : LifecycleService() {
     private suspend fun maybeReschedule() {
         val run = activeRun ?: return
         if (finalized || stopRequested) return
-        if (System.currentTimeMillis() >= run.plannedEndTimeMillis) return
+        val coverageEnd = repo.coverageEndMillis(run)
+        if (System.currentTimeMillis() >= coverageEnd) return
         val now = System.currentTimeMillis()
         val next = repo.computeNextBatchDeadlineMillis(run.id, run.batchSize, now)
             ?: return
         if (next > now) {
-            scheduler?.scheduleNext(min(next, run.plannedEndTimeMillis))
+            scheduler?.scheduleNext(min(next, coverageEnd))
         }
     }
 
     private suspend fun finalizeIfNeeded() {
         val run = activeRun ?: return
         if (finalized) return
+        val coverageEnd = repo.coverageEndMillis(run)
         val writeDeadline = if (stopRequested) {
             System.currentTimeMillis()
         } else {
-            run.plannedEndTimeMillis
+            coverageEnd
         }
         // Temporarily allow catch-up past the loop writeDeadline for natural end.
         val saved = activeRun

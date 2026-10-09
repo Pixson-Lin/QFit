@@ -14,7 +14,11 @@ data class RunEntity(
     val intensityDisplayName: String,
     val plannedDurationMinutes: Int,
     val startTimeMillis: Long,
-    /** Wall-clock planned end (= start + duration). */
+    /**
+     * Configured session end (= start + durationMinutes).
+     * Segment coverage may extend a few seconds past this (last-segment overrun);
+     * the service uses max(this, lastSegmentEnd) as the write/loop deadline.
+     */
     val plannedEndTimeMillis: Long,
     /** Actual end when finished; equals start while RUNNING. */
     val endTimeMillis: Long,

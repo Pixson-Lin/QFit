@@ -12,7 +12,12 @@ import kotlin.random.Random
 class SegmentGenerator(
     private val random: Random = Random.Default,
 ) {
-    fun nextDurationSeconds(): Int = random.nextInt(MIN_DURATION_SEC, MAX_DURATION_SEC_EXCLUSIVE)
+    fun nextDurationSeconds(shortRun: Boolean = false): Int {
+        val minSec = if (shortRun) SHORT_MIN_DURATION_SEC else MIN_DURATION_SEC
+        val maxExclusive =
+            if (shortRun) SHORT_MAX_DURATION_SEC_EXCLUSIVE else MAX_DURATION_SEC_EXCLUSIVE
+        return random.nextInt(minSec, maxExclusive)
+    }
 
     fun generate(
         index: Int,
@@ -33,8 +38,24 @@ class SegmentGenerator(
     }
 
     companion object {
+        /** Default segment length range (inclusive min … exclusive max). */
         const val MIN_DURATION_SEC = 25
         const val MAX_DURATION_SEC_EXCLUSIVE = 36
+
+        /**
+         * Short-run segment length (runs ≤ [SHORT_RUN_THRESHOLD_MINUTES] min).
+         * Shorter slices so steps appear sooner on 1–5 min sessions.
+         */
+        const val SHORT_MIN_DURATION_SEC = 10
+        const val SHORT_MAX_DURATION_SEC_EXCLUSIVE = 16
+        const val SHORT_RUN_THRESHOLD_MINUTES = 5
+
+        /**
+         * Last segment may end up to this many seconds past the configured session end.
+         * Worst case: prior segment ends at sessionEnd − 1s, last draw is 35s → +34s.
+         */
+        const val LAST_SEGMENT_OVERRUN_SEC = 34
+
         const val MIN_STEPS = 1
         const val STEP_SIGMA = 5.0
     }

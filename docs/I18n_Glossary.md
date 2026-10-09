@@ -53,4 +53,5 @@
 | App bar | QFit 電子搖步機 | QFit Step Simulator |
 | Run notification (was 背景搖步) | 搖步提示列 | Run notification |
 | Battery checkbox | 電池最佳化 | Battery Optimization |
+| Expected length note (Home) | 預計時長以排程為準（至多 +34 秒） | Expected length follows the plan (up to +34s) |
 | Tagline | 免登入，只要本機權限，資料不上傳給開發者 | No sign-in. On-device permissions only. Nothing uploaded to the developer. |
