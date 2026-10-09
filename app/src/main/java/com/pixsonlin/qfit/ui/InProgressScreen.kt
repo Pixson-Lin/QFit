@@ -133,15 +133,27 @@ fun InProgressScreen(
                 }
             }
 
+            // When session UI is missing or already finished, Cancel is meaningless.
+            // Offer an explicit Home escape so a desynced Run screen is never a dead end.
+            val canCancel = run != null && run.finished != true
             Button(
-                onClick = { showCancelConfirm = true },
+                onClick = {
+                    if (canCancel) {
+                        showCancelConfirm = true
+                    } else {
+                        onFinishedNavigateHome()
+                    }
+                },
                 modifier = Modifier.width(182.dp),
                 shape = RoundedCornerShape(50),
-                enabled = run != null && run.finished != true,
             ) {
                 Icon(Icons.Filled.Close, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.action_cancel))
+                Text(
+                    stringResource(
+                        if (canCancel) R.string.action_cancel else R.string.action_back_home,
+                    ),
+                )
             }
         }
     }
