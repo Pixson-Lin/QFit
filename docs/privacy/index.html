@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QFit Privacy Policy</title>
+  <meta name="description" content="QFit Privacy Policy. No sign-in; on-device permissions only." />
+  <link rel="stylesheet" href="assets/privacy.css" />
+  <script>
+    (function () {
+      var primary = (navigator.languages && navigator.languages.length)
+        ? navigator.languages[0]
+        : (navigator.language || "en");
+      var s = String(primary || "").toLowerCase().replace(/_/g, "-");
+      var hant = s === "zh-tw" || s === "zh-hk" || s === "zh-mo" ||
+        s.indexOf("zh-hant") === 0 || s === "zh-hant";
+      location.replace(hant ? "zh/" : "en/");
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=en/" />
+  </noscript>
+</head>
+<body>
+  <div class="wrap">
+    <h1>QFit Privacy Policy</h1>
+    <p class="meta">Choose a language:</p>
+    <p><a href="en/">English</a> · <a href="zh/">繁體中文</a></p>
+  </div>
+</body>
+</html>
