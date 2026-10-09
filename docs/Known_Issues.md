@@ -2,6 +2,7 @@
 
 | Field | Value |
 |---|---|
+<<<<<<< HEAD
 | Updated | 2026-10-16 |
 
 ## Crash on Start without Health Connect (Android 13 and below) — fixed in `0.5.3-hcfix`
@@ -13,16 +14,34 @@
 **Workaround (old builds):** Install [Health Connect](https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata) from Play, open QFit again, grant write access.
 
 **Fix (`0.5.3-hcfix`+):** Check `getSdkStatus` before requesting permissions; if provider update is required, open the Play Store install page instead of crashing.
+=======
+| Updated | 2026-10-09 |
+>>>>>>> cd9bbcd (Recover stale in-progress navigation)
 
-## Rare: In-progress stuck, Cancel disabled
+## Mitigated: In-progress stuck, Cancel disabled
 
 **Symptom:** Screen stays on「進行中 / 搖步中」, Cancel button stays disabled; only force-stop / swipe away and reopen recovers.
 
-**Frequency:** Very rare during smoke test; **no reliable repro**.
+**Observed trigger:** Not fully deterministic, but more likely after repeatedly turning the screen off
+or switching apps during a run, then returning to QFit after the planned end time.
 
-**Likely cause (unconfirmed):** Cancel is `enabled = run != null && run.finished != true`. Stuck UI with disabled Cancel implies `RunSessionState.active` is `null` (or already `finished`) while navigation did not leave In-progress — e.g. process/UI desync after kill, or finished flag without successful home navigate.
+**Cause:** The Run screen depended on two volatile assumptions:
 
-**Action:** Recorded only; no fix until reproducible.
+- `RunSessionState` (in-memory) and the restored Navigation back stack were always in sync.
+- Home was always below In-progress in the back stack, so `popBackStack(HOME)` could not fail.
+
+Activity/process restoration can violate either assumption. In particular, an Activity restored
+directly into In-progress has no Home destination to pop to. Once the service marks the in-memory
+run finished, Cancel becomes disabled, but the failed pop leaves the Run screen visible.
+
+**Mitigation:** On every foreground transition, reconcile against the Room `RUNNING` row (the
+durable source of truth): resume an orphan run, or leave a stale In-progress screen. Completion and
+Cancel now explicitly navigate to Home while removing In-progress, so they also work when Home was
+not already in the restored back stack.
+
+**Verification sequence:** Start a run → screen off or switch apps → return to QFit → screen off
+again → wait beyond the planned end → wake directly into QFit. Expected: QFit returns to Home
+instead of remaining on Run with disabled Cancel.
 
 ## Wall-clock catch-up (0.4.0+)
 
