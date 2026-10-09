@@ -19,11 +19,11 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md)
 
-### User guide (GitHub Pages)
+### User guide & privacy (GitHub Pages)
 
-- Source: [docs/index.html](docs/index.html) (auto zh-Hant → `zh/`, else `en/`) · [en](docs/en/) · [zh](docs/zh/)
+- Guide: https://pixson-lin.github.io/QFit/ · source [docs/](docs/) (`en/` · `zh/`)
+- Privacy Policy: https://pixson-lin.github.io/QFit/privacy/ · [en](docs/privacy/en/) · [zh](docs/privacy/zh/)
 - Glossary: [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
-- After Pages is on (`Settings → Pages → Deploy from branch → main → /docs`): https://pixson-lin.github.io/QFit/
 
 ### Sideload
 

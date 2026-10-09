@@ -1,0 +1,80 @@
+:root {
+  --bg: #f7f5fb;
+  --ink: #1c1526;
+  --muted: #5c5268;
+  --brand: #5b3d8f;
+  --line: #ddd4ea;
+  --max: 46rem;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Noto Sans", "PingFang TC", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1000px 420px at 8% -8%, #e8dff8 0%, transparent 55%),
+    var(--bg);
+  line-height: 1.65;
+}
+
+a { color: var(--brand); }
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.lang-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.92rem;
+}
+.lang-switch a {
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+.lang-switch a[aria-current="page"] {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 3.5vw, 2rem);
+  color: var(--brand);
+  margin: 0 0 0.5rem;
+}
+.meta {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+}
+h2 {
+  font-size: 1.2rem;
+  margin: 2rem 0 0.65rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+}
+h3 {
+  font-size: 1.02rem;
+  margin: 1.25rem 0 0.4rem;
+}
+ul { padding-left: 1.3rem; }
+li { margin: 0.35rem 0; }
+.summary {
+  background: #ebe4f7;
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  margin: 1rem 0 1.5rem;
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
