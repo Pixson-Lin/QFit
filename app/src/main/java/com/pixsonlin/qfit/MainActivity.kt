@@ -9,9 +9,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -49,19 +57,48 @@ private object Routes {
 private fun QFitNav() {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val repo = remember(context) { HistoryRepository(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foregroundGeneration by remember { mutableIntStateOf(0) }
     val start = if (RunSessionState.active.value?.finished == false) {
         Routes.IN_PROGRESS
     } else {
         Routes.HOME
     }
 
-    // Orphan RUNNING row after process death: resume service + open In-progress.
-    LaunchedEffect(Unit) {
-        if (RunSessionState.active.value?.finished == false) return@LaunchedEffect
-        val orphan = HistoryRepository(context).getRunningRun() ?: return@LaunchedEffect
-        RunForegroundService.resume(context, orphan)
-        navController.navigate(Routes.IN_PROGRESS) {
+    fun navigateHomeFromRun() {
+        navController.navigate(Routes.HOME) {
+            popUpTo(Routes.IN_PROGRESS) { inclusive = true }
             launchSingleTop = true
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                foregroundGeneration += 1
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    // Room is authoritative after process death or a screen-off / foreground transition.
+    // Reconcile navigation because the in-memory state and restored NavHost back stack can
+    // otherwise disagree, leaving In-progress visible with no cancellable run.
+    LaunchedEffect(foregroundGeneration) {
+        val running = repo.getRunningRun()
+        val active = RunSessionState.active.value
+        when {
+            running != null && active == null -> {
+                RunForegroundService.resume(context, running)
+                navController.navigate(Routes.IN_PROGRESS) {
+                    launchSingleTop = true
+                }
+            }
+            running == null && navController.currentDestination?.route == Routes.IN_PROGRESS -> {
+                navigateHomeFromRun()
+            }
         }
     }
 
@@ -117,10 +154,10 @@ private fun QFitNav() {
                 onOpenAbout = { navController.navigate(Routes.ABOUT) },
                 onCancelConfirmed = {
                     RunForegroundService.cancel(context)
-                    navController.popBackStack(Routes.HOME, inclusive = false)
+                    navigateHomeFromRun()
                 },
                 onFinishedNavigateHome = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
+                    navigateHomeFromRun()
                 },
             )
         }
