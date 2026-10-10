@@ -2,17 +2,46 @@
 
 | Field | Value |
 |---|---|
-| Updated | 2026-10-05 |
+| Updated | 2026-10-09 |
 
-## Rare: In-progress stuck, Cancel disabled
+## Mitigated: In-progress stuck, Cancel disabled
 
 **Symptom:** Screen stays on「進行中 / 搖步中」, Cancel button stays disabled; only force-stop / swipe away and reopen recovers.
 
-**Frequency:** Very rare during smoke test; **no reliable repro**.
+**Observed trigger:** Not 100% deterministic, but more likely after:
 
-**Likely cause (unconfirmed):** Cancel is `enabled = run != null && run.finished != true`. Stuck UI with disabled Cancel implies `RunSessionState.active` is `null` (or already `finished`) while navigation did not leave In-progress — e.g. process/UI desync after kill, or finished flag without successful home navigate.
+1. Enter Run
+2. Screen off (power) or switch apps
+3. Bring QFit to foreground
+4. Screen off again
+5. After planned end time, wake with QFit already in the foreground
 
-**Action:** Recorded only; no fix until reproducible.
+That pattern matches Activity teardown while the run FGS keeps the process (and in-memory
+`RunSessionState`) alive.
+
+**Cause:** The Run screen depended on two volatile assumptions:
+
+- `RunSessionState` (in-memory) and the restored Navigation back stack were always in sync.
+- Home was always below In-progress in the back stack, so `popBackStack(HOME)` could not fail.
+
+When In-progress was chosen as `startDestination` (because `RunSessionState` still held an
+active run after Activity death), the restored stack had no Home entry. After the service marked
+`finished = true`, Cancel became `enabled = false`, but the failed pop left the Run screen up.
+A second race: `collectAsStateWithLifecycle` pauses while STOPPED, so finish-driven navigation
+could miss the transition that happened during screen-off until a later resume path recovered it.
+
+**Mitigation:**
+
+- NavHost always roots at Home; open In-progress with an explicit navigate.
+- Completion / Cancel navigate to Home with `popUpTo(IN_PROGRESS)`.
+- On every foreground transition, reconcile against the Room `RUNNING` row (resume orphan or leave
+  stale In-progress), with one delayed recheck when waking past the planned end.
+- Observe `RunSessionState` finished via the raw Flow (not lifecycle-paused UI state).
+- If Cancel would be disabled, the button becomes「回主畫面 / Home」so the screen is never a dead end.
+
+**Verification sequence:** Start a run → screen off or switch apps → return to QFit → screen off
+again → wait beyond the planned end → wake directly into QFit. Expected: QFit returns to Home
+(or shows Home on the primary button) instead of remaining on Run with a disabled Cancel.
 
 ## Wall-clock catch-up (0.4.0+)
 
