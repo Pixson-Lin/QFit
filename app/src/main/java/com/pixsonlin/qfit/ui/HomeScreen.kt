@@ -268,10 +268,33 @@ fun HomeScreen(
             Button(
                 onClick = {
                     if (!env.healthConnectReady) {
-                        scope.launch {
-                            snackbar.showSnackbar(context.getString(R.string.err_hc_required))
+                        when (HealthConnectWriter.sdkStatus(context)) {
+                            HealthConnectClient.SDK_AVAILABLE -> {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.err_hc_required),
+                                    )
+                                }
+                                hcPermissionLauncher.launch(
+                                    HealthConnectWriter.requiredPermissions,
+                                )
+                            }
+                            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.err_hc_install_required),
+                                    )
+                                }
+                                HealthConnectWriter.openProviderInstall(context)
+                            }
+                            else -> {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.err_hc_unavailable),
+                                    )
+                                }
+                            }
                         }
-                        hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
                         return@Button
                     }
                     if (backgroundRun &&
@@ -312,12 +335,31 @@ fun HomeScreen(
                     label = stringResource(R.string.check_hc),
                     checked = env.healthConnectReady,
                     onClick = {
-                        if (HealthConnectWriter.sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) {
-                            context.startActivity(HealthConnectWriter.settingsIntent())
-                        } else if (!env.healthConnectReady) {
-                            hcPermissionLauncher.launch(HealthConnectWriter.requiredPermissions)
-                        } else {
-                            context.startActivity(HealthConnectWriter.settingsIntent())
+                        when (HealthConnectWriter.sdkStatus(context)) {
+                            HealthConnectClient.SDK_AVAILABLE -> {
+                                if (!env.healthConnectReady) {
+                                    hcPermissionLauncher.launch(
+                                        HealthConnectWriter.requiredPermissions,
+                                    )
+                                } else {
+                                    HealthConnectWriter.openSettingsOrInstall(context)
+                                }
+                            }
+                            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.err_hc_install_required),
+                                    )
+                                }
+                                HealthConnectWriter.openProviderInstall(context)
+                            }
+                            else -> {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(R.string.err_hc_unavailable),
+                                    )
+                                }
+                            }
                         }
                         refreshTick += 1
                     },

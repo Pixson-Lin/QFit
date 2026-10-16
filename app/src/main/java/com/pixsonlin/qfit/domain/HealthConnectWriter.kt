@@ -1,7 +1,9 @@
 package com.pixsonlin.qfit.domain
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
@@ -32,6 +34,59 @@ object HealthConnectWriter {
         Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+
+    /**
+     * Play Store listing for the Health Connect provider app (needed on Android 13
+     * and below when [sdkStatus] is [HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED]).
+     */
+    fun providerInstallIntent(): Intent =
+        Intent(Intent.ACTION_VIEW).apply {
+            setPackage("com.android.vending")
+            data = Uri.parse(
+                "market://details?id=$HEALTH_CONNECT_PACKAGE" +
+                    "&url=healthconnect%3A%2F%2Fonboarding",
+            )
+            putExtra("overlay", true)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+    fun providerInstallWebIntent(): Intent =
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=$HEALTH_CONNECT_PACKAGE"),
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    /** Open Play Store (or web fallback) so the user can install Health Connect. */
+    fun openProviderInstall(context: Context): Boolean {
+        return try {
+            context.startActivity(providerInstallIntent())
+            true
+        } catch (_: ActivityNotFoundException) {
+            try {
+                context.startActivity(providerInstallWebIntent())
+                true
+            } catch (_: ActivityNotFoundException) {
+                false
+            }
+        }
+    }
+
+    /** Open HC settings when available; otherwise send the user to install HC. */
+    fun openSettingsOrInstall(context: Context): Boolean {
+        return when (sdkStatus(context)) {
+            HealthConnectClient.SDK_AVAILABLE -> {
+                try {
+                    context.startActivity(settingsIntent())
+                    true
+                } catch (_: ActivityNotFoundException) {
+                    openProviderInstall(context)
+                }
+            }
+            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED ->
+                openProviderInstall(context)
+            else -> false
+        }
+    }
 
     suspend fun hasWritePermission(context: Context): Boolean {
         if (sdkStatus(context) != HealthConnectClient.SDK_AVAILABLE) return false

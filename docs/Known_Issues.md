@@ -2,7 +2,17 @@
 
 | Field | Value |
 |---|---|
-| Updated | 2026-10-05 |
+| Updated | 2026-10-16 |
+
+## Crash on Start without Health Connect (Android 13 and below) — fixed in `0.5.3-hcfix`
+
+**Symptom:** Tap **開始 / Start** (or HC checkbox) → `QFit keeps stopping`.
+
+**Cause:** On Android 13−, Health Connect is a separate Play app (`com.google.android.apps.healthdata`). If it is not installed, launching `ACTION_REQUEST_PERMISSIONS` throws `ActivityNotFoundException`. Seen on Redmi viva / Android 13 in closed testing.
+
+**Workaround (old builds):** Install [Health Connect](https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata) from Play, open QFit again, grant write access.
+
+**Fix (`0.5.3-hcfix`+):** Check `getSdkStatus` before requesting permissions; if provider update is required, open the Play Store install page instead of crashing.
 
 ## Rare: In-progress stuck, Cancel disabled
 
