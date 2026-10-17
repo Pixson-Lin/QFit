@@ -2,8 +2,7 @@
 
 | Field | Value |
 |---|---|
-<<<<<<< HEAD
-| Updated | 2026-10-16 |
+| Updated | 2026-10-17 |
 
 ## Crash on Start without Health Connect (Android 13 and below) — fixed in `0.5.3-hcfix`
 
@@ -14,9 +13,6 @@
 **Workaround (old builds):** Install [Health Connect](https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata) from Play, open QFit again, grant write access.
 
 **Fix (`0.5.3-hcfix`+):** Check `getSdkStatus` before requesting permissions; if provider update is required, open the Play Store install page instead of crashing.
-=======
-| Updated | 2026-10-09 |
->>>>>>> cd9bbcd (Recover stale in-progress navigation)
 
 ## Mitigated: In-progress stuck, Cancel disabled
 
