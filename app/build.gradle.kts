@@ -27,8 +27,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026101601
-        versionName = "0.5.3-hcfix"
+        versionCode = 2026101701
+        versionName = "0.5.4-stuckfix"
     }
 
     signingConfigs {

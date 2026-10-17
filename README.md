@@ -6,11 +6,12 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 **後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-## Current (`0.5.3-hcfix` / `versionCode` `2026101601`)
+## Current (`0.5.4-stuckfix` / `versionCode` `2026101701`)
 
 - Home: type / duration (**equal-spaced 26 stops** `1,3,5,10…240`, estimate on title row, default 20) / start / env checkboxes / **搖步提示列** toggle / history
 - Segment coverage: last segment up to **+34s** past configured end; **≤5 min** runs use shorter segments; In-progress total follows the plan
 - HC: on Android 13− without Health Connect installed, Start/HC tap opens Play Store instead of crashing (`ActivityNotFoundException`)
+- Run UI: recover stale In-progress after Activity death under a living FGS (Home escape when Cancel would be disabled)
 - **i18n:** English default + Traditional Chinese (`zh-Hant`); non–Traditional-Chinese system locales use English. Glossary: [docs/I18n_Glossary.md](docs/I18n_Glossary.md)
 - Default intensity: **超慢跑 / Slow Jogging**
 - **搖步提示列 / Run notification** (default on): foreground notification; off = no notification, easier for OS to kill
