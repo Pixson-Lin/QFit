@@ -63,6 +63,50 @@ Finish any in-progress run before updating. Steps only mid-run; one distance + o
 </zh-TW>
 ```
 
+## Surfaces to update (UI + write behavior)
+
+| # | Surface | Needed? | Notes |
+|---|---|---|---|
+| 1 | **Google Group** (`qfit-testers`) | **Yes** | Notify opted-in testers; draft below |
+| 2 | **Play Store listing** (short/full description) | **Yes** | Owner: mention new checkbox + end-of-run activity |
+| 3 | **User guide** (`docs/en/`, `docs/zh/`) | **Yes** | Still says “three checkboxes”; need 4th option + Steps mid-run / activity at end |
+| 4 | **Guide screenshots** (`docs/images/01-home*.png`) | **Yes** | Home is now 2×2 with 4 checks |
+| 5 | **Play Console store screenshots** (if Home shot uploaded) | **If used** | Same as guide Home shot |
+| 6 | Privacy policy | No | Permissions unchanged |
+| 7 | Play Health / FGS declarations | No | Same write perms / FGS |
+| 8 | Recruit posts (FB / Reddit / etc.) | Optional | Only if still recruiting with old “writes exercise every segment” wording |
+
+## Google Group — English draft
+
+**Subject:** QFit closed test update — please update (new Home option + Health Connect write change)
+
+```
+Hi everyone,
+
+A new closed-testing build of QFit is rolling out on Play (0.5.5-hc-session).
+
+Please update when Play offers it. Before you update, finish or cancel any run that is still in progress.
+
+What’s new
+• Home now has a fourth checkbox: “Simulate activity & distance” (on by default), in a 2×2 layout with Health Connect / Run notification / Battery Optimization.
+• During a run, QFit writes steps only to Health Connect.
+• When the run ends (complete or cancel), if that checkbox is on, QFit writes one distance record and one exercise session for the whole session—not one every ~30 seconds like before.
+• Walk → Walking in Health Connect; other intensities → Running.
+• If you turn the new checkbox off, that run writes steps only (no activity/distance).
+
+Why this changed
+Some apps that sync from Health Connect struggled when a single run created dozens of short exercise sessions. Writing one activity at the end is closer to how real workouts are recorded and should be gentler on those apps.
+
+What you can try
+1. Update from Play.
+2. Run ~3 minutes with the new checkbox on → confirm many steps appear during the run, then one activity + distance when it ends.
+3. Optional: turn the checkbox off for a short run → steps only, no activity/distance at the end.
+
+Thanks again for helping with closed testing. If anything looks wrong on your device (OEM / Android version welcome), reply to this thread.
+
+— Pixson / QFit
+```
+
 ## Owner build
 
 Sign and upload AAB locally (same as prior closed-test uploads):
