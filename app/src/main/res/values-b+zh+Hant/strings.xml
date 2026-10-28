@@ -20,6 +20,7 @@
     <string name="check_hc">Health Connect</string>
     <string name="check_background_run">搖步提示列</string>
     <string name="check_battery">電池最佳化</string>
+    <string name="check_simulate_activity">模擬活動與距離</string>
     <string name="battery_guide_title">設定電池用量</string>
     <string name="battery_guide_body">接下來會開啟 QFit 的應用程式資訊頁。\n\n1. 點選「電池」\n2. 選擇「不受限制」</string>
     <string name="battery_guide_go">前往設定</string>

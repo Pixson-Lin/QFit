@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [RunEntity::class, SegmentEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class QFitDatabase : RoomDatabase() {
@@ -45,6 +45,26 @@ abstract class QFitDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Session HC write redesign: one Distance+Exercise at finalize.
+         * Mark existing RUNNING rows as already session-written so an upgrade mid-run
+         * does not add a second activity on top of old per-segment Exercise rows.
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE runs ADD COLUMN simulateActivityDistance " +
+                        "INTEGER NOT NULL DEFAULT 1",
+                )
+                db.execSQL(
+                    "ALTER TABLE runs ADD COLUMN sessionHcWritten INTEGER NOT NULL DEFAULT 0",
+                )
+                db.execSQL(
+                    "UPDATE runs SET sessionHcWritten = 1 WHERE status = 'RUNNING'",
+                )
+            }
+        }
+
         fun get(context: Context): QFitDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -52,7 +72,7 @@ abstract class QFitDatabase : RoomDatabase() {
                     QFitDatabase::class.java,
                     "qfit.db",
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                     .also { instance = it }
             }

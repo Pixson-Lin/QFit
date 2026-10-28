@@ -20,6 +20,7 @@
     <string name="check_hc">Health Connect</string>
     <string name="check_background_run">Run notification</string>
     <string name="check_battery">Battery Optimization</string>
+    <string name="check_simulate_activity">Simulate activity &amp; distance</string>
     <string name="battery_guide_title">Set battery usage</string>
     <string name="battery_guide_body">Next, QFit’s App info page will open.\n\n1. Tap Battery\n2. Choose Unrestricted</string>
     <string name="battery_guide_go">Open settings</string>

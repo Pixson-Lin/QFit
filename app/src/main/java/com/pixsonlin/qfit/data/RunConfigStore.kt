@@ -36,11 +36,23 @@ class RunConfigStore(context: Context) {
         prefs.edit().putBoolean(KEY_BACKGROUND_RUN, enabled).apply()
     }
 
+    /**
+     * When true (default), finalize writes one HC Distance + one Exercise for the run.
+     * Mid-run always writes Steps only. When false, HC gets Steps only.
+     */
+    fun isSimulateActivityDistanceEnabled(): Boolean =
+        prefs.getBoolean(KEY_SIMULATE_ACTIVITY_DISTANCE, DEFAULT_SIMULATE_ACTIVITY_DISTANCE)
+
+    fun setSimulateActivityDistanceEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_SIMULATE_ACTIVITY_DISTANCE, enabled).apply()
+    }
+
     companion object {
         const val MIN_DURATION_MIN = 1
         const val MAX_DURATION_MIN = 240
         const val DEFAULT_DURATION_MIN = 20
         const val DEFAULT_BACKGROUND_RUN = true
+        const val DEFAULT_SIMULATE_ACTIVITY_DISTANCE = true
         val DEFAULT_INTENSITY: IntensityLevel = IntensityLevel.SUPER_SLOW_JOG
 
         /**
@@ -61,6 +73,7 @@ class RunConfigStore(context: Context) {
         private const val KEY_DURATION_MIN = "duration_minutes"
         private const val KEY_INTENSITY = "intensity"
         private const val KEY_BACKGROUND_RUN = "background_run"
+        private const val KEY_SIMULATE_ACTIVITY_DISTANCE = "simulate_activity_distance"
 
         fun snapToStep(minutes: Int): Int =
             DURATION_STOPS.minBy { abs(it - minutes) }

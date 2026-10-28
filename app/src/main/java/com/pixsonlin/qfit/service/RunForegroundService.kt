@@ -18,10 +18,12 @@ import com.pixsonlin.qfit.R
 import com.pixsonlin.qfit.data.HistoryRepository
 import com.pixsonlin.qfit.data.HistoryRepository.Companion.toSegmentData
 import com.pixsonlin.qfit.data.IntensityLevel
+import com.pixsonlin.qfit.data.RunConfigStore
 import com.pixsonlin.qfit.data.db.RunEntity
 import com.pixsonlin.qfit.data.db.RunStatus
 import com.pixsonlin.qfit.domain.CatchUpThrottle
 import com.pixsonlin.qfit.domain.HealthConnectWriter
+import com.pixsonlin.qfit.domain.SessionHcFinalizer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -92,7 +94,13 @@ class RunForegroundService : LifecycleService() {
             ensureChannel()
             promoteForeground(0, durationMinutes)
         }
-        val run = repo.startPlannedRun(intensity, durationMinutes, backgroundRun)
+        val simulateActivity = RunConfigStore(this).isSimulateActivityDistanceEnabled()
+        val run = repo.startPlannedRun(
+            intensity = intensity,
+            durationMinutes = durationMinutes,
+            backgroundRun = backgroundRun,
+            simulateActivityDistance = simulateActivity,
+        )
         attachAndLoop(run)
     }
 
@@ -236,7 +244,7 @@ class RunForegroundService : LifecycleService() {
                 lock?.acquireForWrite()
                 val writeResult = try {
                     runCatching {
-                        HealthConnectWriter.writeSegments(
+                        HealthConnectWriter.writeStepSegments(
                             this@RunForegroundService,
                             batch.map { it.toSegmentData() },
                         )
@@ -322,7 +330,7 @@ class RunForegroundService : LifecycleService() {
                 lock?.acquireForWrite()
                 val writeResult = try {
                     runCatching {
-                        HealthConnectWriter.writeSegments(
+                        HealthConnectWriter.writeStepSegments(
                             this@RunForegroundService,
                             batch.map { it.toSegmentData() },
                         )
@@ -339,6 +347,24 @@ class RunForegroundService : LifecycleService() {
                 RunSessionState.update { it.copy(stepsWritten = totalSteps) }
             }
         }
+
+        val lock = wakeLock
+        lock?.acquireForWrite()
+        val sessionOk = try {
+            SessionHcFinalizer.ensureSessionWritten(
+                this@RunForegroundService,
+                repo,
+                run,
+            )
+        } finally {
+            lock?.releaseWrite()
+        }
+        if (!sessionOk) {
+            RunSessionState.update {
+                it.copy(errorMessage = it.errorMessage ?: "Session HC write failed")
+            }
+        }
+
         repo.markAllPlannedSkipped(run.id)
         val totalSteps = repo.sumWrittenSteps(run.id)
         val status = if (stopRequested) RunStatus.CANCELLED else RunStatus.COMPLETED

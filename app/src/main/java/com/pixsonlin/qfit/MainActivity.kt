@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pixsonlin.qfit.data.HistoryRepository
+import com.pixsonlin.qfit.domain.SessionHcFinalizer
 import com.pixsonlin.qfit.service.RunForegroundService
 import com.pixsonlin.qfit.service.RunSessionState
 import com.pixsonlin.qfit.ui.AboutScreen
@@ -110,6 +111,9 @@ private fun QFitNav() {
     // Reconcile navigation because the in-memory state and restored NavHost back stack can
     // otherwise disagree, leaving In-progress visible with no cancellable run.
     LaunchedEffect(foregroundGeneration) {
+        // Retry Distance+Exercise if a prior finalize failed the session insert.
+        SessionHcFinalizer.retryPending(context, repo)
+
         val route = navController.currentBackStackEntryFlow
             .first()
             .destination

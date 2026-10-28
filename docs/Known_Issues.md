@@ -2,7 +2,15 @@
 
 | Field | Value |
 |---|---|
-| Updated | 2026-10-17 |
+| Updated | 2026-10-28 |
+
+## Many HC ExerciseSession / Distance rows mid-run — mitigated in `0.5.5-hc-session`
+
+**Symptom:** Downstream apps that sync Health Connect (e.g. some Garmin Connect paths) choke or crash when a single QFit run inserts dozens of short ExerciseSession + Distance records (one per ~25–35s segment).
+
+**Mitigation (`0.5.5-hc-session`+):** Mid-run writes **Steps only**. At session end, if Home **模擬活動與距離 / Simulate activity & distance** is on (default), write **one** Distance + **one** Exercise for the WRITTEN span. Unchecked = Steps only. See [Closed_Test_0.5.5_Notes.md](Closed_Test_0.5.5_Notes.md).
+
+**Upgrade note:** Finish or cancel any in-progress run before updating. Existing `RUNNING` rows are marked `sessionHcWritten` on DB migration so the new build does not add a second activity on top of old per-segment writes.
 
 ## Crash on Start without Health Connect (Android 13 and below) — fixed in `0.5.3-hcfix`
 
