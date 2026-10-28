@@ -37,6 +37,7 @@
 
 - Rows are **display only**; **no chevrons**.
 - Card uses `secondaryContainer` background.
+- Shows type, **模擬活動與距離 有/無** (from run snapshot), steps, elapsed/total.
 - Cancel → **confirm dialog**; stop future writes; keep HC data already written.
 - Status after end: 已完成 or 已取消.
 
@@ -44,7 +45,7 @@
 
 - Persist runs + segments in **Room** (no sample data; empty state when none).
 - History list hides in-flight `RUNNING` rows.
-- Card summary: start time, type, planned vs actual duration, steps, status.
+- Card summary: start time, type, **模擬活動與距離 有/無**, planned vs actual duration, steps, status.
 - Card border: `1.5.dp` `primary` purple stroke for clearer separation.
 - **詳細記錄** collapsed by default; label is **green + underline**; tap expands segment lines (PLANNED hidden).
 - Segment line: `#n HH:mm:ss-HH:mm:ss, N步, D公尺, 成功/失敗/略過`.

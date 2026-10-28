@@ -43,6 +43,9 @@
     <string name="segment_skipped">Skipped</string>
 
     <string name="in_progress_title">In progress</string>
+    <string name="label_simulate_activity">Activity &amp; distance</string>
+    <string name="value_simulate_on">On</string>
+    <string name="value_simulate_off">Off</string>
     <string name="label_current_steps">Steps so far</string>
     <string name="label_elapsed_total">Elapsed / total</string>
     <string name="action_cancel">Cancel</string>
@@ -54,6 +57,7 @@
     <string name="history_empty">No runs yet.</string>
     <string name="history_start_time">Started: %1$s</string>
     <string name="history_type">Type: %1$s</string>
+    <string name="history_simulate_activity">Activity &amp; distance: %1$s</string>
     <string name="history_duration">Duration: planned %1$s, actual %2$s</string>
     <string name="history_steps">Steps: %1$d</string>
     <string name="history_status">Status: %1$s</string>

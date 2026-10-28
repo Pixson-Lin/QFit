@@ -27,8 +27,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026102801
-        versionName = "0.5.5-hc-session"
+        versionCode = 2026102802
+        versionName = "0.5.6-sim-badge"
     }
 
     signingConfigs {

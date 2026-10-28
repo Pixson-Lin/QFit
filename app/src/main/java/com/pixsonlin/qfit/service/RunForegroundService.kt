@@ -145,6 +145,7 @@ class RunForegroundService : LifecycleService() {
                 durationMinutes = run.plannedDurationMinutes,
                 startTimeMillis = run.startTimeMillis,
                 endTimeMillis = coverageEnd,
+                simulateActivityDistance = run.simulateActivityDistance,
                 stepsWritten = repo.sumWrittenSteps(run.id),
             ),
         )

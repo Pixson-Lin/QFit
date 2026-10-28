@@ -43,6 +43,9 @@
     <string name="segment_skipped">略過</string>
 
     <string name="in_progress_title">進行中</string>
+    <string name="label_simulate_activity">模擬活動與距離</string>
+    <string name="value_simulate_on">有</string>
+    <string name="value_simulate_off">無</string>
     <string name="label_current_steps">目前步數</string>
     <string name="label_elapsed_total">已進行/總共</string>
     <string name="action_cancel">取消</string>
@@ -54,6 +57,7 @@
     <string name="history_empty">還沒有搖步紀錄。</string>
     <string name="history_start_time">搖步開始時間 : %1$s</string>
     <string name="history_type">類型 : %1$s</string>
+    <string name="history_simulate_activity">模擬活動與距離 : %1$s</string>
     <string name="history_duration">時長 : 設定%1$s ，實際 %2$s</string>
     <string name="history_steps">步數 : %1$d</string>
     <string name="history_status">狀態 : %1$s</string>

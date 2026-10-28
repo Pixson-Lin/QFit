@@ -2,10 +2,11 @@
 
 | Field | Value |
 |---|---|
-| versionName | `0.5.5-hc-session` |
-| versionCode | `2026102801` |
+| versionName | `0.5.6-sim-badge` (was `0.5.5-hc-session`) |
+| versionCode | `2026102802` (was `2026102801`) |
 | Track | Closed testing |
 | Date | 2026-10-28 (Asia/Taipei) |
+| Extra UI | In-progress + History show 模擬活動與距離 有/無 (On/Off) |
 
 ## Before you update
 

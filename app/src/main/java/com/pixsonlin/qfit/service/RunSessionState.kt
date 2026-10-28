@@ -11,6 +11,8 @@ data class ActiveRunUi(
     val durationMinutes: Int,
     val startTimeMillis: Long,
     val endTimeMillis: Long,
+    /** Snapshot of Home「模擬活動與距離」for this run. */
+    val simulateActivityDistance: Boolean = true,
     val stepsWritten: Int = 0,
     val finished: Boolean = false,
     val errorMessage: String? = null,

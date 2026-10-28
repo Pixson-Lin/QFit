@@ -115,6 +115,16 @@ fun InProgressScreen(
                         supporting = run?.intensity?.label() ?: "—",
                     )
                     ProgressRow(
+                        headline = stringResource(R.string.label_simulate_activity),
+                        supporting = stringResource(
+                            if (run?.simulateActivityDistance == true) {
+                                R.string.value_simulate_on
+                            } else {
+                                R.string.value_simulate_off
+                            },
+                        ),
+                    )
+                    ProgressRow(
                         headline = stringResource(R.string.label_current_steps),
                         supporting = (run?.stepsWritten ?: 0).toString(),
                     )
