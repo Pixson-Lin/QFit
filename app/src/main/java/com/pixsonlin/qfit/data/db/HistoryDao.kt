@@ -28,6 +28,23 @@ interface HistoryDao {
     @Query("SELECT * FROM runs WHERE status = 'RUNNING' ORDER BY startTimeMillis DESC LIMIT 1")
     suspend fun getRunningRun(): RunEntity?
 
+    @Query(
+        "SELECT * FROM runs WHERE sessionHcWritten = 0 AND status != 'RUNNING' " +
+            "AND simulateActivityDistance = 1",
+    )
+    suspend fun getRunsPendingSessionHc(): List<RunEntity>
+
+    @Query(
+        "UPDATE runs SET sessionHcWritten = 1 WHERE id = :runId",
+    )
+    suspend fun markSessionHcWritten(runId: String)
+
+    @Query(
+        "SELECT * FROM segments WHERE runId = :runId AND writeStatus = 'WRITTEN' " +
+            "ORDER BY segmentIndex ASC",
+    )
+    suspend fun getWrittenSegments(runId: String): List<SegmentEntity>
+
     @Transaction
     @Query(
         "SELECT * FROM runs WHERE status != 'RUNNING' ORDER BY startTimeMillis DESC",

@@ -26,6 +26,16 @@ data class RunEntity(
     val status: String,
     val batchSize: Int = DEFAULT_BATCH_SIZE,
     val backgroundRun: Boolean = true,
+    /**
+     * Snapshot of Home「模擬活動與距離」at run start.
+     * When true, finalize writes one Distance + one Exercise for WRITTEN span.
+     */
+    val simulateActivityDistance: Boolean = true,
+    /**
+     * True after session Distance+Exercise succeeded, or after finalize decided
+     * not to write them (option off / zero WRITTEN). Prevents duplicate HC sessions.
+     */
+    val sessionHcWritten: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_BATCH_SIZE = 2
@@ -61,4 +71,11 @@ data class RunWithSegments(
     @Embedded val run: RunEntity,
     @Relation(parentColumn = "id", entityColumn = "runId")
     val segments: List<SegmentEntity>,
+)
+
+/** Aggregate over WRITTEN segments for one HC session summary. */
+data class WrittenSpan(
+    val startTimeMillis: Long,
+    val endTimeMillis: Long,
+    val distanceMeters: Double,
 )

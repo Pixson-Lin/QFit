@@ -7,6 +7,7 @@ import com.pixsonlin.qfit.data.db.RunStatus
 import com.pixsonlin.qfit.data.db.RunWithSegments
 import com.pixsonlin.qfit.data.db.SegmentEntity
 import com.pixsonlin.qfit.data.db.SegmentWriteStatus
+import com.pixsonlin.qfit.data.db.WrittenSpan
 import com.pixsonlin.qfit.domain.SegmentData
 import com.pixsonlin.qfit.domain.SegmentPlanner
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,7 @@ class HistoryRepository(context: Context) {
         intensity: IntensityLevel,
         durationMinutes: Int,
         backgroundRun: Boolean,
+        simulateActivityDistance: Boolean = true,
         batchSize: Int = RunEntity.DEFAULT_BATCH_SIZE,
     ): RunEntity {
         val runId = UUID.randomUUID().toString()
@@ -45,6 +47,8 @@ class HistoryRepository(context: Context) {
             status = RunStatus.RUNNING.name,
             batchSize = batchSize,
             backgroundRun = backgroundRun,
+            simulateActivityDistance = simulateActivityDistance,
+            sessionHcWritten = false,
         )
         dao.insertRun(run)
         val planned = planner.planAllSegments(start, plannedEnd, intensity)
@@ -93,6 +97,17 @@ class HistoryRepository(context: Context) {
 
     suspend fun sumWrittenSteps(runId: String): Int = dao.sumWrittenSteps(runId)
 
+    /** WRITTEN segment span for one HC Distance+Exercise; null if none written. */
+    suspend fun writtenSpan(runId: String): WrittenSpan? {
+        val written = dao.getWrittenSegments(runId)
+        if (written.isEmpty()) return null
+        return WrittenSpan(
+            startTimeMillis = written.minOf { it.startTimeMillis },
+            endTimeMillis = written.maxOf { it.endTimeMillis },
+            distanceMeters = written.sumOf { it.distanceMeters },
+        )
+    }
+
     suspend fun markSegmentsWritten(batch: List<SegmentEntity>) {
         if (batch.isEmpty()) return
         dao.updateSegments(
@@ -122,6 +137,12 @@ class HistoryRepository(context: Context) {
     suspend fun markAllPlannedSkipped(runId: String) {
         dao.markAllPlannedSkipped(runId)
     }
+
+    suspend fun markSessionHcWritten(runId: String) {
+        dao.markSessionHcWritten(runId)
+    }
+
+    suspend fun getRunsPendingSessionHc(): List<RunEntity> = dao.getRunsPendingSessionHc()
 
     suspend fun finalizeRun(
         runId: String,

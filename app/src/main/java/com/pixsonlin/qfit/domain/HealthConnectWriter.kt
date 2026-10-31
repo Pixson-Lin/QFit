@@ -12,6 +12,7 @@ import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.units.Length
+import com.pixsonlin.qfit.data.IntensityLevel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -94,7 +95,21 @@ object HealthConnectWriter {
         return granted.containsAll(requiredPermissions)
     }
 
-    suspend fun writeSegments(context: Context, segments: List<SegmentData>) {
+    /** Map QFit intensity → HC Int constant (not freeform). No title/notes. */
+    fun exerciseTypeFor(intensity: IntensityLevel): Int = when (intensity) {
+        IntensityLevel.STROLL -> ExerciseSessionRecord.EXERCISE_TYPE_WALKING
+        IntensityLevel.SUPER_SLOW_JOG,
+        IntensityLevel.JOG,
+        IntensityLevel.MARATHON,
+        IntensityLevel.SPRINT,
+        -> ExerciseSessionRecord.EXERCISE_TYPE_RUNNING
+    }
+
+    /**
+     * Mid-run / catch-up: Steps only (one record per due segment).
+     * Distance + Exercise are written once at session close via [writeSessionSummary].
+     */
+    suspend fun writeStepSegments(context: Context, segments: List<SegmentData>) {
         if (segments.isEmpty()) return
         val now = System.currentTimeMillis()
         segments.forEach { segment ->
@@ -111,32 +126,59 @@ object HealthConnectWriter {
             val end = Instant.ofEpochMilli(segment.endTimeMillis)
             val startOffset = zone.rules.getOffset(start)
             val endOffset = zone.rules.getOffset(end)
-            val metadata = Metadata.manualEntry()
             records += StepsRecord(
                 count = segment.steps.toLong(),
                 startTime = start,
                 endTime = end,
                 startZoneOffset = startOffset,
                 endZoneOffset = endOffset,
-                metadata = metadata,
-            )
-            records += DistanceRecord(
-                distance = Length.meters(segment.distanceMeters.toDouble()),
-                startTime = start,
-                endTime = end,
-                startZoneOffset = startOffset,
-                endZoneOffset = endOffset,
-                metadata = metadata,
-            )
-            records += ExerciseSessionRecord(
-                exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
-                startTime = start,
-                endTime = end,
-                startZoneOffset = startOffset,
-                endZoneOffset = endOffset,
-                metadata = metadata,
+                metadata = Metadata.manualEntry(),
             )
         }
         client.insertRecords(records)
+    }
+
+    /**
+     * Once per run at finalize: single Distance + single Exercise over the WRITTEN span.
+     * [exerciseType] must be an HC `EXERCISE_TYPE_*` Int; title/notes are intentionally null.
+     */
+    suspend fun writeSessionSummary(
+        context: Context,
+        startTimeMillis: Long,
+        endTimeMillis: Long,
+        distanceMeters: Double,
+        exerciseType: Int,
+    ) {
+        require(startTimeMillis < endTimeMillis)
+        require(endTimeMillis <= System.currentTimeMillis()) {
+            "Session end must not be in the future."
+        }
+        val client = getClient(context)
+        val zone = ZoneId.systemDefault()
+        val start = Instant.ofEpochMilli(startTimeMillis)
+        val end = Instant.ofEpochMilli(endTimeMillis)
+        val startOffset = zone.rules.getOffset(start)
+        val endOffset = zone.rules.getOffset(end)
+        val metadata = Metadata.manualEntry()
+        client.insertRecords(
+            listOf(
+                DistanceRecord(
+                    distance = Length.meters(distanceMeters),
+                    startTime = start,
+                    endTime = end,
+                    startZoneOffset = startOffset,
+                    endZoneOffset = endOffset,
+                    metadata = metadata,
+                ),
+                ExerciseSessionRecord(
+                    exerciseType = exerciseType,
+                    startTime = start,
+                    endTime = end,
+                    startZoneOffset = startOffset,
+                    endZoneOffset = endOffset,
+                    metadata = metadata,
+                ),
+            ),
+        )
     }
 }

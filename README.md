@@ -6,9 +6,10 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 **後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-## Current (`0.5.4-stuckfix` / `versionCode` `2026101701`)
+## Current (`0.5.6-sim-badge` / `versionCode` `2026102802`)
 
-- Home: type / duration (**equal-spaced 26 stops** `1,3,5,10…240`, estimate on title row, default 20) / start / env checkboxes / **搖步提示列** toggle / history
+- Home: type / duration (**equal-spaced 26 stops** `1,3,5,10…240`, estimate on title row, default 20) / start / **2×2** env checks / history
+- **模擬活動與距離** (default on): Steps mid-run; **one** HC Distance + Exercise at end (散步→WALKING, else RUNNING). Off = Steps only. Shown on In-progress + History
 - Segment coverage: last segment up to **+34s** past configured end; **≤5 min** runs use shorter segments; In-progress total follows the plan
 - HC: on Android 13− without Health Connect installed, Start/HC tap opens Play Store instead of crashing (`ActivityNotFoundException`)
 - Run UI: recover stale In-progress after Activity death under a living FGS (Home escape when Cancel would be disabled)
@@ -20,7 +21,7 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 - About（最下方顯示 `versionName` + `versionCode`）
 - **Scheme C lite**: pre-plan segments, **batchSize=2**, AlarmManager next-deadline + SCREEN_ON catch-up, orphan resume
 
-Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md) · Play declarations: [docs/Play_Console_Declarations.md](docs/Play_Console_Declarations.md) · Release signing: [docs/Release_Signing.md](docs/Release_Signing.md)
+Decisions: [docs/MVP_Home_Decisions.md](docs/MVP_Home_Decisions.md) · Versioning: [docs/Versioning.md](docs/Versioning.md) · Issues: [docs/Known_Issues.md](docs/Known_Issues.md) · Closed-test `0.5.5` notes: [docs/Closed_Test_0.5.5_Notes.md](docs/Closed_Test_0.5.5_Notes.md) · Play declarations: [docs/Play_Console_Declarations.md](docs/Play_Console_Declarations.md) · Release signing: [docs/Release_Signing.md](docs/Release_Signing.md)
 
 ### User guide & privacy (GitHub Pages)
 

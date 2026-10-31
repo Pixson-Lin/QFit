@@ -206,6 +206,20 @@ private fun HistoryCard(
             )
             Text(
                 text = stringResource(
+                    R.string.history_simulate_activity,
+                    stringResource(
+                        if (run.simulateActivityDistance) {
+                            R.string.value_simulate_on
+                        } else {
+                            R.string.value_simulate_off
+                        },
+                    ),
+                ),
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Text(
+                text = stringResource(
                     R.string.history_duration,
                     formatMmSs(run.plannedDurationMinutes * 60_000L),
                     formatMmSs((run.endTimeMillis - run.startTimeMillis).coerceAtLeast(0L)),

@@ -98,6 +98,9 @@ fun HomeScreen(
     }
     var durationMinutes by remember { mutableIntStateOf(config.getDurationMinutes()) }
     var backgroundRun by remember { mutableStateOf(config.isBackgroundRunEnabled()) }
+    var simulateActivityDistance by remember {
+        mutableStateOf(config.isSimulateActivityDistanceEnabled())
+    }
     var dropdownExpanded by remember { mutableStateOf(false) }
     var env by remember {
         mutableStateOf(
@@ -325,70 +328,90 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
 
-            // One row: HC · 搖步提示列 · 電池
-            Row(
+            // 2×2: HC · 搖步提示列 / 電池 · 模擬活動與距離
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
+                verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
-                StatusCheck(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.check_hc),
-                    checked = env.healthConnectReady,
-                    onClick = {
-                        when (HealthConnectWriter.sdkStatus(context)) {
-                            HealthConnectClient.SDK_AVAILABLE -> {
-                                if (!env.healthConnectReady) {
-                                    hcPermissionLauncher.launch(
-                                        HealthConnectWriter.requiredPermissions,
-                                    )
-                                } else {
-                                    HealthConnectWriter.openSettingsOrInstall(context)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_hc),
+                        checked = env.healthConnectReady,
+                        onClick = {
+                            when (HealthConnectWriter.sdkStatus(context)) {
+                                HealthConnectClient.SDK_AVAILABLE -> {
+                                    if (!env.healthConnectReady) {
+                                        hcPermissionLauncher.launch(
+                                            HealthConnectWriter.requiredPermissions,
+                                        )
+                                    } else {
+                                        HealthConnectWriter.openSettingsOrInstall(context)
+                                    }
+                                }
+                                HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
+                                    scope.launch {
+                                        snackbar.showSnackbar(
+                                            context.getString(R.string.err_hc_install_required),
+                                        )
+                                    }
+                                    HealthConnectWriter.openProviderInstall(context)
+                                }
+                                else -> {
+                                    scope.launch {
+                                        snackbar.showSnackbar(
+                                            context.getString(R.string.err_hc_unavailable),
+                                        )
+                                    }
                                 }
                             }
-                            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
-                                scope.launch {
-                                    snackbar.showSnackbar(
-                                        context.getString(R.string.err_hc_install_required),
-                                    )
-                                }
-                                HealthConnectWriter.openProviderInstall(context)
+                            refreshTick += 1
+                        },
+                    )
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_background_run),
+                        checked = backgroundRun,
+                        onClick = {
+                            val next = !backgroundRun
+                            backgroundRun = next
+                            config.setBackgroundRunEnabled(next)
+                            if (next &&
+                                Build.VERSION.SDK_INT >= 33 &&
+                                !env.notificationsReady
+                            ) {
+                                notificationPermissionLauncher.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS,
+                                )
                             }
-                            else -> {
-                                scope.launch {
-                                    snackbar.showSnackbar(
-                                        context.getString(R.string.err_hc_unavailable),
-                                    )
-                                }
-                            }
-                        }
-                        refreshTick += 1
-                    },
-                )
-                StatusCheck(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.check_background_run),
-                    checked = backgroundRun,
-                    onClick = {
-                        val next = !backgroundRun
-                        backgroundRun = next
-                        config.setBackgroundRunEnabled(next)
-                        if (next &&
-                            Build.VERSION.SDK_INT >= 33 &&
-                            !env.notificationsReady
-                        ) {
-                            notificationPermissionLauncher.launch(
-                                Manifest.permission.POST_NOTIFICATIONS,
-                            )
-                        }
-                        refreshTick += 1
-                    },
-                )
-                StatusCheck(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.check_battery),
-                    checked = env.batteryReady,
-                    onClick = { showBatteryGuide = true },
-                )
+                            refreshTick += 1
+                        },
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_battery),
+                        checked = env.batteryReady,
+                        onClick = { showBatteryGuide = true },
+                    )
+                    StatusCheck(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.check_simulate_activity),
+                        checked = simulateActivityDistance,
+                        onClick = {
+                            val next = !simulateActivityDistance
+                            simulateActivityDistance = next
+                            config.setSimulateActivityDistanceEnabled(next)
+                        },
+                    )
+                }
             }
             } // end scrollable column
 
