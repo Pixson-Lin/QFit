@@ -67,6 +67,15 @@ Output (typical):
 
 Confirm it used the upload key (when `keystore.properties` exists). Without that file, Gradle falls back to the **debug** keystore — **do not upload a debug-signed AAB** to Play for closed testing.
 
+Release builds enable R8 (`isMinifyEnabled` + `isShrinkResources`). Verify the AAB carries the mapping file before upload:
+
+```bash
+unzip -l app/build/outputs/bundle/release/app-release.aab | grep -E 'proguard\.map|debugsymbols'
+```
+
+Expect `BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map`.  
+`debugsymbols` appears only when a dependency ships an **unstripped** `.so`. Today the only native lib is Compose’s `libandroidx.graphics.path.so`, which AndroidX publishes already stripped — AGP cannot invent symbols for it, so Play may still show the native-symbols warning. That warning is non-blocking; leave `ndk.debugSymbolLevel = SYMBOL_TABLE` so any future unstripped native code is packaged automatically. NDK must be installed locally (`sdkmanager "ndk;…"`).
+
 ### 4. Upload in Play Console
 
 1. **Testing → Closed testing** → create release  

@@ -1,4 +1,38 @@
-# Closed test — `0.5.5-hc-session` release notes
+# Closed test — release notes
+
+## Current candidate — `1.0.0-prerelease`
+
+| Field | Value |
+|---|---|
+| versionName | `1.0.0-prerelease` |
+| versionCode | `2026103101` |
+| Track | Closed testing (while waiting for production access) |
+| Date | 2026-10-31 (Asia/Taipei) |
+| User-facing | Same as `0.5.6-sim-badge` (no feature change) |
+| Build | Release R8 minify + shrink; `proguard.map` embedded in AAB |
+
+### Play Console — paste (1.0.0-prerelease)
+
+```
+<en-US>
+• Version 1.0.0-prerelease (build while production access is under review)
+• Same features as 0.5.6 — simulate activity & distance, steps mid-run, one activity at end
+• Release build now includes R8 mapping for clearer crash reports
+• Please finish or cancel any in-progress run before updating
+</en-US>
+<zh-TW>
+• 版本 1.0.0-prerelease（正式上架審核期間的候選版）
+• 功能與 0.5.6 相同：模擬活動與距離、進行中寫步數、結束時一筆活動
+• Release 已開啟 R8，崩潰報告可去模糊化
+• 請先結束或取消進行中的跑步再更新
+</zh-TW>
+```
+
+Prefer plain **`1.0.0`** (new `versionCode`) for the first Production release users see as live.
+
+---
+
+## Earlier — `0.5.5-hc-session` / `0.5.6-sim-badge`
 
 | Field | Value |
 |---|---|

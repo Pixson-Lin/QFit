@@ -6,7 +6,7 @@ Android「電子搖步機」：無 Google Sign-In，將步數寫入 Health Conne
 
 **後續動作請視 APBFit 裡面的檔案為唯讀，所有變動都在 QFit 這邊。** See [AGENTS.md](AGENTS.md).
 
-## Current (`0.5.6-sim-badge` / `versionCode` `2026102802`)
+## Current (`1.0.0-prerelease` / `versionCode` `2026103101`)
 
 - Home: type / duration (**equal-spaced 26 stops** `1,3,5,10…240`, estimate on title row, default 20) / start / **2×2** env checks / history
 - **模擬活動與距離** (default on): Steps mid-run; **one** HC Distance + Exercise at end (散步→WALKING, else RUNNING). Off = Steps only. Shown on In-progress + History

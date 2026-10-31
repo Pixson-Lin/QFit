@@ -27,8 +27,8 @@ android {
         minSdk = 31
         targetSdk = 36
         // versionCode = YYYYMMDDNN (Taipei calendar day + daily serial). See docs/Versioning.md
-        versionCode = 2026102802
-        versionName = "0.5.6-sim-badge"
+        versionCode = 2026103101
+        versionName = "1.0.0-prerelease"
     }
 
     signingConfigs {
@@ -44,7 +44,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 minify → proguard.map ships in AAB for Play crash deobfuscation.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            // Extract native symbols when .so files still have a symbol table.
+            // Compose's androidx.graphics.path ships pre-stripped; Play may still warn.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             signingConfig = if (hasUploadKeystore) {
                 signingConfigs.getByName("release")
             } else {
