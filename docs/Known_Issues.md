@@ -2,7 +2,15 @@
 
 | Field | Value |
 |---|---|
-| Updated | 2026-10-28 |
+| Updated | 2026-10-31 |
+
+## Play Console native debug symbols warning — expected (`1.0.0-prerelease`+)
+
+**Symptom:** After uploading an AAB, Play warns that native debug symbols are missing.
+
+**Cause:** Release includes Compose transitive `libandroidx.graphics.path.so`. The published AAR is already **stripped**, so AGP’s `ndk.debugSymbolLevel = SYMBOL_TABLE` extracts an empty symbol set and does not embed `BUNDLE-METADATA/.../debugsymbols`.
+
+**Status:** Non-blocking. R8 `proguard.map` **is** embedded (Java/Kotlin deobfuscation works). Native symbolication for that one third-party `.so` is unavailable until AndroidX ships unstripped libs or a symbols artifact. See [Release_Signing.md](Release_Signing.md).
 
 ## Many HC ExerciseSession / Distance rows mid-run — mitigated in `0.5.5-hc-session`
 

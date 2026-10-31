@@ -2,15 +2,17 @@
 
 | Field | Value |
 |---|---|
-| Updated | 2026-10-05 |
+| Updated | 2026-10-31 |
 | Status | Locked with owner |
 
 ## Rules
 
 | Field | Format | Role |
 |---|---|---|
-| `versionName` | `0.MINOR.PATCH[-label]`（例：`0.4.1-icon`） | 給人看的產品版號；標籤可選，描述這次重點 |
+| `versionName` | `MAJOR.MINOR.PATCH[-label]`（例：`0.4.1-icon`、`1.0.0-prerelease`） | 給人看的產品版號；標籤可選，描述這次重點 |
 | `versionCode` | `YYYYMMDDNN` | Android 安裝／更新用的整數 build number |
+
+First public / production candidate may use **`1.0.0-prerelease`** while waiting for Play production access; prefer plain **`1.0.0`** (or next patch) on the build users see as the first Production release.
 
 ### `versionCode` (`YYYYMMDDNN`)
 
