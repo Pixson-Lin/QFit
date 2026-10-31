@@ -31,10 +31,11 @@
         <li><a href="#s2">Allow Health Connect write access</a></li>
         <li><a href="#s3">Turn on Run notification</a></li>
         <li><a href="#s4">Set Battery Optimization to Unrestricted</a></li>
-        <li><a href="#s5">Choose type and duration</a></li>
-        <li><a href="#s6">Tap Start and wait to finish</a></li>
-        <li><a href="#s7">Check History</a></li>
-        <li><a href="#s8">FAQ</a></li>
+        <li><a href="#s5">Simulate activity &amp; distance (optional)</a></li>
+        <li><a href="#s6">Choose type and duration</a></li>
+        <li><a href="#s7">Tap Start and wait to finish</a></li>
+        <li><a href="#s8">Check History</a></li>
+        <li><a href="#s9">FAQ</a></li>
       </ol>
     </nav>
 
@@ -56,7 +57,7 @@
       <ol class="steps">
         <li>Copy the APK to your phone and tap to install.</li>
         <li>If Android blocks unknown sources, allow installs from that source, then try again.</li>
-        <li>Open <strong>QFit</strong>. On Home you can set type and duration, use the three checkboxes below, and open History at the bottom right.</li>
+        <li>Open <strong>QFit</strong>. On Home you can set type and duration, use the four checkboxes in a 2×2 grid below, and open History at the bottom right.</li>
       </ol>
       <figure class="shot">
         <img src="../images/01-home_en.png" alt="QFit home screen" />
@@ -137,7 +138,30 @@
     </section>
 
     <section id="s5">
-      <h2><span class="n">5.</span> Choose type and duration</h2>
+      <h2><span class="n">5.</span> Simulate activity &amp; distance (optional)</h2>
+      <p>
+        The fourth Home checkbox, <strong>Simulate activity &amp; distance</strong>, controls whether QFit also writes
+        a <strong>distance</strong> record and an <strong>exercise session</strong> into Health Connect.
+        It is <strong>on by default</strong>. Mid-run, QFit always writes <strong>steps only</strong>;
+        when the run ends (complete or cancel), if this option was on for that run, QFit writes
+        <strong>one</strong> distance + <strong>one</strong> exercise for the whole written span
+        (Walk → Walking; other types → Running).
+      </p>
+      <div class="tip">
+        <strong>When to leave it on:</strong> apps or sync tools that expect a workout / activity session
+        or distance (for example some fitness apps that sync from Health Connect).<br />
+        <strong>When to turn it off:</strong> step-focused games and apps that mainly need a step count
+        (for example <strong>Pikmin Bloom</strong>). Off = steps only for that run—usually enough, and avoids
+        extra activity/distance rows those apps do not use.
+      </div>
+      <div class="note">
+        Changing the checkbox applies to the <strong>next</strong> run you start. In progress and History
+        show On/Off for that run so you can confirm what was used.
+      </div>
+    </section>
+
+    <section id="s6">
+      <h2><span class="n">6.</span> Choose type and duration</h2>
       <ol class="steps">
         <li><strong>Type</strong>: defaults to <strong>Slow Jogging</strong>; you can also pick Walk, Jog, Marathon, or Sprint.</li>
         <li><strong>Duration</strong>: drag the slider. For a first try, use 1–5 minutes (default is about 20).</li>
@@ -145,21 +169,22 @@
       </ol>
       <figure class="shot">
         <img src="../images/05-type-duration_en.png" alt="Type and duration controls" />
-        <figcaption>Figure 5 · Type and duration</figcaption>
+        <figcaption>Figure 6 · Type and duration</figcaption>
       </figure>
     </section>
 
-    <section id="s6">
-      <h2><span class="n">6.</span> Tap Start and wait to finish</h2>
+    <section id="s7">
+      <h2><span class="n">7.</span> Tap Start and wait to finish</h2>
       <ol class="steps">
-        <li>When all three checkboxes are ready, tap <strong>Start</strong>.</li>
-        <li>On the In progress screen, watch steps so far and elapsed / total time.</li>
+        <li>When <strong>Health Connect</strong> is ready (and ideally Run notification + Battery Optimization), tap <strong>Start</strong>. The fourth checkbox is optional—see above.</li>
+        <li>On the In progress screen, watch type, activity &amp; distance On/Off, steps so far, and elapsed / total time.</li>
         <li>If Run notification is on, the status bar also shows the run.</li>
-        <li>The run ends when time is up. You can tap <strong>Cancel</strong> (with confirm): no further writes occur, but steps already in Health Connect remain, and History shows Cancelled.</li>
+        <li>During the run, Health Connect receives <strong>steps</strong> as segments become due. Activity and distance (if enabled) appear when the run <strong>ends</strong>.</li>
+        <li>The run ends when time is up. You can tap <strong>Cancel</strong> (with confirm): no further writes occur, but data already in Health Connect remains, and History shows Cancelled.</li>
       </ol>
       <figure class="shot">
         <img src="../images/06-in-progress_en.png" alt="Run in progress screen" />
-        <figcaption>Figure 6 · In progress</figcaption>
+        <figcaption>Figure 7 · In progress</figcaption>
       </figure>
       <div class="tip">
         <strong>First run tip:</strong> try 1–3 minutes with the screen on and confirm steps increase.
@@ -167,22 +192,22 @@
       </div>
     </section>
 
-    <section id="s7">
-      <h2><span class="n">7.</span> Check History</h2>
+    <section id="s8">
+      <h2><span class="n">8.</span> Check History</h2>
       <ol class="steps">
         <li>On Home, tap <strong>History</strong> at the bottom right.</li>
-        <li>Each card shows start time, type, duration, steps, and status (Completed / Cancelled).</li>
-        <li>Tap the green underlined <strong>Details</strong> to expand segment write results.</li>
-        <li><strong>Clear history</strong> only deletes local QFit records—not steps already in Health Connect.</li>
+        <li>Each card shows start time, type, <strong>Activity &amp; distance On/Off</strong>, duration, steps, and status (Completed / Cancelled).</li>
+        <li>Tap the green underlined <strong>Details</strong> to expand segment write results (Room still stores per-segment distance for the log even if HC activity was off).</li>
+        <li><strong>Clear history</strong> only deletes local QFit records—not data already in Health Connect.</li>
       </ol>
       <figure class="shot">
         <img src="../images/07-history_en.png" alt="History list" />
-        <figcaption>Figure 7 · History</figcaption>
+        <figcaption>Figure 8 · History</figcaption>
       </figure>
     </section>
 
-    <section id="s8">
-      <h2><span class="n">8.</span> FAQ</h2>
+    <section id="s9">
+      <h2><span class="n">9.</span> FAQ</h2>
       <p><strong>Q. Health Connect stays unchecked?</strong><br />
         Tap Health Connect again to finish granting access, and confirm Health Connect is installed.</p>
       <p><strong>Q. Battery Optimization stays unchecked?</strong><br />
@@ -191,6 +216,8 @@
         Keep Run notification and Battery Optimization on. After the screen turns on again, QFit tries to catch up writes that were due while the screen was off.</p>
       <p><strong>Q. Another app does not see the steps?</strong><br />
         In Health Connect, give that app <strong>read</strong> access and confirm it can see data written by QFit.</p>
+      <p><strong>Q. Should I turn on Simulate activity &amp; distance?</strong><br />
+        Leave it on if the destination app wants a workout/activity or distance. For step-only games (e.g. Pikmin Bloom), turning it off is usually fine—you still get steps.</p>
       <p><strong>Q. What is the top-left menu?</strong><br />
         About: purpose, disclaimer, and version numbers.</p>
     </section>
